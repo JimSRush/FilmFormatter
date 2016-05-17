@@ -2,7 +2,6 @@ C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\bin\Debug\FilmFormatter.exe.c
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\bin\Debug\FilmFormatter.exe
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\bin\Debug\FilmFormatter.pdb
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\bin\Debug\DocumentFormat.OpenXml.dll
-C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.csprojResolveAssemblyReference.cache
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.Properties.Resources.resources
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.csproj.GenerateResource.Cache
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.exe

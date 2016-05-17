@@ -44,16 +44,20 @@ namespace FilmFormatter
             {
                 WorkbookPart workbookPart = myDoc.WorkbookPart;
                 WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();
-                SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().First();
+                SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
                 Console.WriteLine("Opened sheet");
+
+ 
                 foreach (Row r in sheetData.Elements<Row>())
                 {
                     foreach (Cell c in r.Elements<Cell>())
                     {
-                        if (c.DataType == CellValues.SharedString) 
+                        if ((c.DataType != null) && (c.DataType == CellValues.SharedString))
                         {
-                            //http://stackoverflow.com/questions/5115257/open-xml-excel-read-cell-value
-                            Console.WriteLine("Found a shared string");
+                            String text = workbookPart.SharedStringTablePart.SharedStringTable
+                                .Elements<SharedStringItem>().ElementAt(
+                                    Convert.ToInt32(c.CellValue.Text)).InnerText;
+                            Console.WriteLine(text);
                         }
                         //Console.WriteLine(c.DataType);
                     }
