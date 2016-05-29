@@ -33,22 +33,29 @@ namespace FilmFormatter
             Console.WriteLine("I've just clicked a button");
             String file = openFileDialog1.FileName;
             Console.WriteLine("File is called " + file);
-            parseFile(file);
+            loadFile(file);
            
         }
 
-        private void parseFile(String fileName) 
+        private void loadFile(String fileName) 
         {
             Console.WriteLine("parsing file or something");
             using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fileName, true)) 
             {
                 WorkbookPart workbookPart = myDoc.WorkbookPart;
-                WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();
+                WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
                 SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
                 Console.WriteLine("Opened sheet");
+                printSheetToConsole(sheetData, workbookPart);
 
- 
-                foreach (Row r in sheetData.Elements<Row>())
+
+            }
+        }
+
+
+        private void printSheetToConsole(SheetData sheetData, WorkbookPart workbookPart)
+        { 
+             foreach (Row r in sheetData.Elements<Row>())
                 {
                     foreach (Cell c in r.Elements<Cell>())
                     {
@@ -59,10 +66,13 @@ namespace FilmFormatter
                                     Convert.ToInt32(c.CellValue.Text)).InnerText;
                             Console.WriteLine(text);
                         }
-                        //Console.WriteLine(c.DataType);
                     }
                 }
-            }
         }
+        private WorksheetPart GetWorkSheetFromSheetName(WorkbookPart workbookpart, String sheetName) {
+            Sheet sheet = workbookpart.Workbook.Descendants<Sheet>().FirstOrDefault(s => s.Name == sheetName);
+            if (sheet == null) throw new Exception(string.Format("Could not find sheet with name {0}", sheetName));
+            else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
+        } 
    } 
 }
