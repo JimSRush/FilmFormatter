@@ -65,6 +65,8 @@ namespace FilmFormatter
                                 .Elements<SharedStringItem>().ElementAt(
                                     Convert.ToInt32(c.CellValue.Text)).InnerText;
                             Console.WriteLine(text);
+                        } if (c.DataType == CellValues.Date) {
+                            Console.WriteLine(c.DataType.ToString());
                         }
                     }
                 }
