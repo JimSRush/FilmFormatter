@@ -77,7 +77,8 @@ namespace FilmFormatter
 							int value;
 							if (int.TryParse(c.InnerText, out value)) {
 								if (value != 0) {
-									DateTime newDate = DateTime.FromOADate(value);
+									Console.WriteLine(c.InnerText);
+									DateTime newDate = DateTime.FromOADate(value+1462);
 									Console.WriteLine(newDate);
 								}
 
