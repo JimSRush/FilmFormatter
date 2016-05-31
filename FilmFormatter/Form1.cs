@@ -58,19 +58,37 @@ namespace FilmFormatter
              foreach (Row r in sheetData.Elements<Row>())
                 {
                     foreach (Cell c in r.Elements<Cell>())
-                    {
-                        if ((c.DataType != null) && (c.DataType == CellValues.SharedString))
+                    {   //If it's not null, it's a string
+                        if (c != null)
                         {
-                            String text = workbookPart.SharedStringTablePart.SharedStringTable
-                                .Elements<SharedStringItem>().ElementAt(
-                                    Convert.ToInt32(c.CellValue.Text)).InnerText;
-                            Console.WriteLine(text);
-                        } if (c.DataType == CellValues.Date) {
-                            Console.WriteLine(c.DataType.ToString());
-                        }
-                    }
-                }
-        }
+							if (c.DataType != null) 
+                            {
+								
+								if (c.DataType == CellValues.SharedString)
+								{
+									String text = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(c.CellValue.Text)).InnerText;
+									Console.WriteLine(text);
+								}
+							}
+							else { 
+
+							//check if it's an int
+							//print
+							int value;
+							if (int.TryParse(c.InnerText, out value)) {
+								if (value != 0) {
+									DateTime newDate = DateTime.FromOADate(value);
+									Console.WriteLine(newDate);
+								}
+
+							}
+							
+							}
+						}
+					}	
+				}
+            }
+       
         private WorksheetPart GetWorkSheetFromSheetName(WorkbookPart workbookpart, String sheetName) {
             Sheet sheet = workbookpart.Workbook.Descendants<Sheet>().FirstOrDefault(s => s.Name == sheetName);
             if (sheet == null) throw new Exception(string.Format("Could not find sheet with name {0}", sheetName));
