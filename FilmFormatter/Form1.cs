@@ -102,37 +102,37 @@ namespace FilmFormatter
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
 			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();
+			Console.WriteLine("The size of the list is: " + sheetData.Elements<Row>().Count());
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				if (!r.Elements<Cell>().Any()) { Console.WriteLine("Found a small row"); }
-				if (r.Elements<Cell>().Any())
+				Console.WriteLine("This this ain't all that big " + r.Elements<Cell>().Count());
+				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(2);
+				Cell runningTimeCell = r.Elements<Cell>().ElementAtOrDefault(10);
+
+				if (titleCell != null)
 				{
-					Cell titleCell = r.Elements<Cell>().ElementAt(2);
-					Cell runningTimeCell = r.Elements<Cell>().ElementAt(10);
-
-					if (titleCell != null)
+					if (titleCell.DataType != null)
 					{
-						if (titleCell.DataType != null)
+						String title = "";
+						if (titleCell.DataType == CellValues.SharedString)
 						{
-							String title = "";
-							if (titleCell.DataType == CellValues.SharedString)
-							{
-								title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
-								Console.WriteLine(title);
-							}
-
-							int runningTime;
-							if (int.TryParse(runningTimeCell.InnerText, out runningTime))
-							{
-								Console.WriteLine(runningTime);
-							}
-							ttrt.Add(System.Tuple.Create(title, runningTime));
-
+							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
+							Console.WriteLine(title);
+							Console.WriteLine("Some random execution");
 						}
+
+						int runningTime;
+						if (int.TryParse(runningTimeCell.InnerText, out runningTime))
+						{
+							Console.WriteLine(runningTime);
+						}
+						ttrt.Add(System.Tuple.Create(title, runningTime));
+
 					}
 				}
 			}
+
 			Console.WriteLine("Opened main sheet");
 			return ttrt;
 		}
