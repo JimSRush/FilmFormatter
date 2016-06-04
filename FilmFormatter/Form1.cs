@@ -121,27 +121,30 @@ namespace FilmFormatter
 			foreach (Row r in sheetData.Elements<Row>()) {
 				
 				//need a list of cells
+
+				//TODO: check the size of the collection before returning elementAt
 				Cell titleCell = r.Elements<Cell>().ElementAt(2);
 				Cell runningTimeCell = r.Elements<Cell>().ElementAt(10);
-				if (titleCell != null && titleCell.DataType != null) {
-				{
-					if (titleCell.DataType == CellValues.SharedString) {
-						string title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
-						Console.WriteLine(title);
-					}
+				if (titleCell != null) {
+					if (titleCell.DataType != null)
+					{
+						if (titleCell.DataType == CellValues.SharedString) {
+							string title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
+							Console.WriteLine(title);
+						}
 
-					int runningTime;
-					if (int.TryParse(runningTimeCell.InnerText, out runningTime)) {
-						Console.WriteLine(runningTime);
+						int runningTime;
+						if (int.TryParse(runningTimeCell.InnerText, out runningTime)) {
+							Console.WriteLine(runningTime);
 					
+						}
 					}
 				}
-
 				//String title = r.Elements<Cell>().ElementAt(2);
 			}
 			Console.WriteLine("Opened main sheet");
 			return ttrt;
 		}
-		return null;
+		
    } 
-}}
+}
