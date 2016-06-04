@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace FilmFormatter
     public partial class Form1 : Form
     {
 
-   
+		Dictionary<string, int> titlesToRunTime = new Dictionary<string, int>();
+	
         public Form1()
         {
             InitializeComponent();
@@ -39,19 +41,22 @@ namespace FilmFormatter
 
         private void loadFile(String fileName) 
         {
-            Console.WriteLine("parsing file or something");
-            using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fileName, true)) 
-            {
-                WorkbookPart workbookPart = myDoc.WorkbookPart;
-                WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
-                SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
-                Console.WriteLine("Opened sheet");
-                printSheetToConsole(sheetData, workbookPart);
+			using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			{
+				using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fs, false)) 
+				{
+					WorkbookPart workbookPart = myDoc.WorkbookPart;
+					titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
+					//parse main sheet
+					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
+					
+					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
+					Console.WriteLine("Opened sheet");
+					printSheetToConsole(sheetData, workbookPart);
 
-
-            }
-        }
-
+				}
+			}	
+		}
 
         private void printSheetToConsole(SheetData sheetData, WorkbookPart workbookPart)
         { 
@@ -59,15 +64,27 @@ namespace FilmFormatter
                 {
                     foreach (Cell c in r.Elements<Cell>())
                     {   //If it's not null, it's a string
+						Console.WriteLine("CellValue is: " + c.CellValue);
+						
                         if (c != null)
                         {
-							if (c.DataType != null) 
+							if (c.DataType != null)  
                             {
 								
 								if (c.DataType == CellValues.SharedString)
 								{
 									String text = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(c.CellValue.Text)).InnerText;
 									Console.WriteLine(text);
+
+									//plug in second screen
+									//loop from 4 to wheneve4r
+									//create data structure to hold screening information 
+										//create methods to return session info based on time
+										//
+									//Key of city, values list of screenings.
+									//put all this in 
+									//create map of venue to abbreviated venue
+
 								}
 							}
 							else { 
@@ -94,6 +111,37 @@ namespace FilmFormatter
             Sheet sheet = workbookpart.Workbook.Descendants<Sheet>().FirstOrDefault(s => s.Name == sheetName);
             if (sheet == null) throw new Exception(string.Format("Could not find sheet with name {0}", sheetName));
             else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
-        } 
+        }
+
+		private Dictionary<String, int> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
+		{
+			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
+			Dictionary<string, int> ttrt = new Dictionary<string, int>();
+			
+			foreach (Row r in sheetData.Elements<Row>()) {
+				
+				//need a list of cells
+				Cell titleCell = r.Elements<Cell>().ElementAt(2);
+				Cell runningTimeCell = r.Elements<Cell>().ElementAt(10);
+				if (titleCell != null && titleCell.DataType != null) {
+				{
+					if (titleCell.DataType == CellValues.SharedString) {
+						string title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
+						Console.WriteLine(title);
+					}
+
+					int runningTime;
+					if (int.TryParse(runningTimeCell.InnerText, out runningTime)) {
+						Console.WriteLine(runningTime);
+					
+					}
+				}
+
+				//String title = r.Elements<Cell>().ElementAt(2);
+			}
+			Console.WriteLine("Opened main sheet");
+			return ttrt;
+		}
+		return null;
    } 
-}
+}}
