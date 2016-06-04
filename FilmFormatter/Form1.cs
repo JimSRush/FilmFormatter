@@ -17,7 +17,7 @@ namespace FilmFormatter
 	public partial class Form1 : Form
 	{
 
-		Dictionary<string, int> titlesToRunTime = new Dictionary<string, int>();
+		List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
 
 		public Form1()
 		{
@@ -98,10 +98,10 @@ namespace FilmFormatter
 			else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
 		}
 
-		private Dictionary<String, int> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
+		private List<Tuple<String, int>> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
-			Dictionary<string, int> ttrt = new Dictionary<string, int>();
+			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
@@ -127,7 +127,7 @@ namespace FilmFormatter
 							{
 								Console.WriteLine(runningTime);
 							}
-							ttrt.Add(title, runningTime);
+							ttrt.Add(System.Tuple.Create(title, runningTime));
 
 						}
 					}
