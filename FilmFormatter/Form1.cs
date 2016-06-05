@@ -51,74 +51,85 @@ namespace FilmFormatter
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
 					//parse by title -- List<Dictionary<title, titleSession>() 
 					List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();					//
-					
+
 					filmsByTitle = GetFilmsByTitle(sheetData, workbookPart);
 
-					
+
 				}
 			}
 		}
 
-		private List<Dictionary<string, List<TitleSessionInfo>>> GetFilmsByTitle(SheetData sheetData, WorkbookPart workbookpart) {
-			
+		private List<Dictionary<string, List<TitleSessionInfo>>> GetFilmsByTitle(SheetData sheetData, WorkbookPart workbookpart)
+		{
+
 			List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();
 
 			int titlePosition = 3;
 			int datePosition = 6;
 			int timePosition = 7;
 			int venuePosition = 9;
-			int cityPosition= 10;
+			int cityPosition = 10;
 
-			foreach (Row r in sheetData.Elements<Row>()) 
-			{ 
-
+			foreach (Row r in sheetData.Elements<Row>())
+			{
 				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(titlePosition);
 				Cell dateCell = r.Elements<Cell>().ElementAtOrDefault(datePosition);
 				Cell timeCell = r.Elements<Cell>().ElementAtOrDefault(timePosition);
 				Cell venueCell = r.Elements<Cell>().ElementAtOrDefault(venuePosition);
 				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
 
+				String title = "";
+				String venue = "";
+				String city = "";
+				DateTime newDate = new DateTime();
+				TimeSpan ts = new TimeSpan();
 
 				if (titleCell != null && venueCell != null && cityCell != null)
-				{ 
+				{
 					//Time to pluck out the title, venue and city.
 					if (titleCell.DataType != null && venueCell.DataType != null && cityCell.DataType != null)
 					{
 						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString)
 						{
-							String title = "";
-							String venue = "";
-							String city = "";
+
 							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
 							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
-						}
-						else 
-						{ 
+							String formattedValue = timeCell.InnerText;
+
+							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
+							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
 							int value;
 							if (int.TryParse(dateCell.InnerText, out value))
 							{
 								if (value != 0)
 								{
-									Console.WriteLine(dateCell.InnerText);
-									DateTime newDate = DateTime.FromOADate(value + 1462);
-									Console.WriteLine(newDate);
+									newDate = DateTime.FromOADate(value + 1462);
 								}
 							}
 						}
-						
-						
 					}
+
+					if (title!=null || title != "")
+					{
+						Console.WriteLine("Title: " + title);
+						Console.WriteLine("Date: " + newDate);
+						Console.WriteLine("Time: " + ts);
+						Console.WriteLine("Venue: " + venue);
+						Console.WriteLine("City: " + city + "\n");
+					}
+					
 				}
+				
 			}
 			//for each row
 			//parse venue, date, time, title
 			//check list to see if key exists
 			//if doesn't exist, create new + insert in list
 			//if exists, add to list associated with title key
-			
-			
-			
+
+
+
 			return filmsByTitle;
 		}
 
@@ -167,7 +178,7 @@ namespace FilmFormatter
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
 			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();
-			
+
 			foreach (Row r in sheetData.Elements<Row>())
 			{
 				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(2);
