@@ -18,6 +18,13 @@ namespace FilmFormatter
 	{
 
 		List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
+		
+
+	
+
+
+
+		
 
 		public Form1()
 		{
@@ -50,25 +57,27 @@ namespace FilmFormatter
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
 					//parse by title -- List<Dictionary<title, titleSession>() 
-					List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();					//
+					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();					//
 
-					filmsByTitle = GetFilmsByTitle(sheetData, workbookPart);
+					rawFilms = parseFilms(sheetData, workbookPart);
+					Console.WriteLine("Should have broken here");
 
 
 				}
 			}
 		}
 
-		private List<Dictionary<string, List<TitleSessionInfo>>> GetFilmsByTitle(SheetData sheetData, WorkbookPart workbookpart)
+		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
 		{
-
-			List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();
+			//TODO: It should really be just a list of session objects
+			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
 			int titlePosition = 3;
 			int datePosition = 6;
 			int timePosition = 7;
 			int venuePosition = 9;
 			int cityPosition = 10;
+			int shortPosition = 4; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
@@ -77,12 +86,14 @@ namespace FilmFormatter
 				Cell timeCell = r.Elements<Cell>().ElementAtOrDefault(timePosition);
 				Cell venueCell = r.Elements<Cell>().ElementAtOrDefault(venuePosition);
 				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
+				Cell shortCell = r.Elements<Cell>().ElementAtOrDefault(shortPosition);
 
 				String title = "";
 				String venue = "";
 				String city = "";
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
+				String shortFilm = "";
 
 				if (titleCell != null && venueCell != null && cityCell != null)
 				{
@@ -91,14 +102,16 @@ namespace FilmFormatter
 					{
 						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString)
 						{
-
+							//Here, we have to get the text for each. TODO put this in a method.
 							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
 							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
+							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
+							//And the time
 							String formattedValue = timeCell.InnerText;
-
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
 							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
+							//AAAAaaand the date
 							int value;
 							if (int.TryParse(dateCell.InnerText, out value))
 							{
@@ -108,63 +121,18 @@ namespace FilmFormatter
 								}
 							}
 						}
-					}
-
-					if (title!=null || title != "")
-					{
-						Console.WriteLine("Title: " + title);
-						Console.WriteLine("Date: " + newDate);
-						Console.WriteLine("Time: " + ts);
-						Console.WriteLine("Venue: " + venue);
-						Console.WriteLine("City: " + city + "\n");
-					}
-					
-				}
-				
-			}
-			//for each row
-			//parse venue, date, time, title
-			//check list to see if key exists
-			//if doesn't exist, create new + insert in list
-			//if exists, add to list associated with title key
-
-
-
-			return filmsByTitle;
-		}
-
-		private void printSheetToConsole(SheetData sheetData, WorkbookPart workbookPart)
-		{
-			foreach (Row r in sheetData.Elements<Row>())
-			{
-				foreach (Cell c in r.Elements<Cell>())
-				{   //If it's not null, it's a string
-					if (c != null)
-					{
-						if (c.DataType != null)
+						if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 						{
-							if (c.DataType == CellValues.SharedString)
-							{
-								String text = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(c.CellValue.Text)).InnerText;
-								Console.WriteLine(text);
-							}
-						}
-						else
-						{
-							int value;
-							if (int.TryParse(c.InnerText, out value))
-							{
-								if (value != 0)
-								{
-									Console.WriteLine(c.InnerText);
-									DateTime newDate = DateTime.FromOADate(value + 1462);
-									Console.WriteLine(newDate);
-								}
-							}
+							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm);
+						
+								rawSchedule.Add(sessionInfo);
+						
+							
 						}
 					}
 				}
 			}
+			return rawSchedule;
 		}
 
 		private WorksheetPart GetWorkSheetFromSheetName(WorkbookPart workbookpart, String sheetName)
