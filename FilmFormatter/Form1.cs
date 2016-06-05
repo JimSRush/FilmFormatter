@@ -45,25 +45,80 @@ namespace FilmFormatter
 				using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fs, false))
 				{
 					WorkbookPart workbookPart = myDoc.WorkbookPart;
-					titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
+					//titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
 					//parse main sheet
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
-					Console.WriteLine("Opened sheet");
-					
 					//parse by title -- List<Dictionary<title, titleSession>() 
 					List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();					//
 					
-					printSheetToConsole(sheetData, workbookPart);
+					filmsByTitle = GetFilmsByTitle(sheetData, workbookPart);
 
-					//parse
-
+					
 				}
 			}
 		}
 
 		private List<Dictionary<string, List<TitleSessionInfo>>> GetFilmsByTitle(SheetData sheetData, WorkbookPart workbookpart) {
+			
 			List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();
+
+			int titlePosition = 3;
+			int datePosition = 6;
+			int timePosition = 7;
+			int venuePosition = 9;
+			int cityPosition= 10;
+
+			foreach (Row r in sheetData.Elements<Row>()) 
+			{ 
+
+				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(titlePosition);
+				Cell dateCell = r.Elements<Cell>().ElementAtOrDefault(datePosition);
+				Cell timeCell = r.Elements<Cell>().ElementAtOrDefault(timePosition);
+				Cell venueCell = r.Elements<Cell>().ElementAtOrDefault(venuePosition);
+				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
+
+
+				if (titleCell != null && venueCell != null && cityCell != null)
+				{ 
+					//Time to pluck out the title, venue and city.
+					if (titleCell.DataType != null && venueCell.DataType != null && cityCell.DataType != null)
+					{
+						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString)
+						{
+							String title = "";
+							String venue = "";
+							String city = "";
+							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
+							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
+							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
+						}
+						else 
+						{ 
+							int value;
+							if (int.TryParse(dateCell.InnerText, out value))
+							{
+								if (value != 0)
+								{
+									Console.WriteLine(dateCell.InnerText);
+									DateTime newDate = DateTime.FromOADate(value + 1462);
+									Console.WriteLine(newDate);
+								}
+							}
+						}
+						
+						
+					}
+				}
+			}
+			//for each row
+			//parse venue, date, time, title
+			//check list to see if key exists
+			//if doesn't exist, create new + insert in list
+			//if exists, add to list associated with title key
+			
+			
+			
 			return filmsByTitle;
 		}
 
@@ -112,11 +167,9 @@ namespace FilmFormatter
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
 			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();
-			Console.WriteLine("The size of the list is: " + sheetData.Elements<Row>().Count());
-
+			
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				Console.WriteLine("This this ain't all that big " + r.Elements<Cell>().Count());
 				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(2);
 				Cell runningTimeCell = r.Elements<Cell>().ElementAtOrDefault(10);
 
@@ -129,7 +182,6 @@ namespace FilmFormatter
 						{
 							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
 							Console.WriteLine(title);
-							Console.WriteLine("Some random execution");
 						}
 
 						int runningTime;

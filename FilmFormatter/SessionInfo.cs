@@ -6,9 +6,22 @@ using System.Threading.Tasks;
 
 namespace FilmFormatter
 {
-    class TitleSessionInfo
-    {
+	class TitleSessionInfo
+	{
+		private string sessionType;
+		private string venue;
+		private string date;
+		private string time;
 
+		public TitleSessionInfo()
+		{
 
-    }
+		}
+
+		void setSessionType(String session)
+		{
+
+		return;
+		}
+	}
 }
