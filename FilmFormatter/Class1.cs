@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace FilmFormatter
 {
-	class Class1
+	class ByTitle
 	{
+
+	private string sessionType;
+	private string venue;
+	private string date;
+	private string time;
+
+
+	
 	}
 }

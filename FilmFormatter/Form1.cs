@@ -50,10 +50,21 @@ namespace FilmFormatter
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
 					Console.WriteLine("Opened sheet");
+					
+					//parse by title -- List<Dictionary<title, titleSession>() 
+					List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();					//
+					
 					printSheetToConsole(sheetData, workbookPart);
+
+					//parse
 
 				}
 			}
+		}
+
+		private List<Dictionary<string, List<TitleSessionInfo>>> GetFilmsByTitle(SheetData sheetData, WorkbookPart workbookpart) {
+			List<Dictionary<string, List<TitleSessionInfo>>> filmsByTitle = new List<Dictionary<string, List<TitleSessionInfo>>>();
+			return filmsByTitle;
 		}
 
 		private void printSheetToConsole(SheetData sheetData, WorkbookPart workbookPart)
@@ -62,7 +73,6 @@ namespace FilmFormatter
 			{
 				foreach (Cell c in r.Elements<Cell>())
 				{   //If it's not null, it's a string
-					Console.WriteLine("CellValue is: " + c.CellValue);
 					if (c != null)
 					{
 						if (c.DataType != null)
@@ -128,12 +138,9 @@ namespace FilmFormatter
 							Console.WriteLine(runningTime);
 						}
 						ttrt.Add(System.Tuple.Create(title, runningTime));
-
 					}
 				}
 			}
-
-			Console.WriteLine("Opened main sheet");
 			return ttrt;
 		}
 	}

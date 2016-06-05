@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FilmFormatter
 {
-    class SessionInfo
+    class TitleSessionInfo
     {
 
 
