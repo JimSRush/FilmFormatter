@@ -18,13 +18,6 @@ namespace FilmFormatter
 	{
 
 		List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
-		
-
-	
-
-
-
-		
 
 		public Form1()
 		{
@@ -60,13 +53,35 @@ namespace FilmFormatter
 					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();					//
 
 					rawFilms = parseFilms(sheetData, workbookPart);
+
+					//OK, now we have the films in memory. Now what?
+
+					//GIve me everything in Auckland
+					List<Dictionary<String, TitleSessionInfo>> aucklandFilms = new List<Dictionary<String, TitleSessionInfo>>();
+				
+					//
+					//Lets make a datastructure that looks something like a list of cities, each city has a list of titles, 
+					//List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>> cityByTitle = new List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>>>(); 
 					Console.WriteLine("Should have broken here");
-
-
 				}
 			}
 		}
 
+		private List<Dictionary<String, TitleSessionInfo>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms) 
+		{
+			List<Dictionary<String, TitleSessionInfo>> filmByCity = new List<Dictionary<String, TitleSessionInfo>>();
+			foreach (TitleSessionInfo session in rawFilms)
+			{
+				if (session.getCity() == city) 
+				{ 
+					
+				}
+				
+			}
+			return filmByCity;
+
+
+		}
 		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
 		{
 			//TODO: It should really be just a list of session objects
@@ -124,10 +139,11 @@ namespace FilmFormatter
 						if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 						{
 							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm);
-						
+							//Gotta ignore the blank cells
+							if (sessionInfo.getCity() != "") 
+							{
 								rawSchedule.Add(sessionInfo);
-						
-							
+							}
 						}
 					}
 				}
