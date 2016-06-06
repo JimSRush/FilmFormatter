@@ -14,6 +14,7 @@ namespace FilmFormatter
 		private string city;
 		private string time;
 		private string filmTitle;
+		private string shortFilm;
 
 		public String getSessionType()
 		{
@@ -67,7 +68,7 @@ namespace FilmFormatter
 			{"RIALTO", "RIALTO"},
 			{"RIALTO D", "RIALTO"},
 			{"ROXY", "RX"},
-			{"SKYCITY", "SCT"},
+			{"SKY CITY", "SCT"},
 			{"TEPAPA", "TP"}
 		};
 
@@ -79,6 +80,7 @@ namespace FilmFormatter
 			setAbbreviatedVenue(venue);
 			this.filmTitle = title;
 			this.city = city;
+			this.shortFilm = shortFilm;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{

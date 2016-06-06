@@ -67,47 +67,50 @@ namespace FilmFormatter
 					writeOutDatesToFile(aucklandFilmsByDate, "Auckland");
 					writeOutTitlesToFile(wellingtonFilmsByTitle, "Wellington");
 					writeOutDatesToFile(wellingtonFilmsByDate, "Wellington");
+					Application.Exit();
 					
 				}
 			}
 		}
 
 		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms) { 
-			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByTitle = new List<Dictionary<String, List<TitleSessionInfo>>>();
+			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<String, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms) 
 			{ 
 				if (session.getCity() == city)
 				{
-					if(!filmsByCityByTitle.Any(dic => dic.ContainsKey(session.getDate())))
+					if (!filmsByCityByDate.Any(dic => dic.ContainsKey(session.getDate())))
 					{
 						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
 						{
 							{session.getDate(), new List<TitleSessionInfo>(){session}}
 						};
-						filmsByCityByTitle.Add(toAdd);
+						filmsByCityByDate.Add(toAdd);
 					}
 					else 
 					{
-						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByCityByTitle)
+						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByCityByDate)
 						{
 							if (dict.ContainsKey(session.getDate()))
 							{
 								List<TitleSessionInfo> toUpdate = dict[session.getDate()];
 								toUpdate.Add(session);
-								dict[session.getTitle()] = toUpdate;
+								dict[session.getDate()] = toUpdate;
 							}
 						}
 					}
 				}
 			}
-			return filmsByCityByTitle;
+			return filmsByCityByDate;
 		}
 
 		
 
 		private void writeOutDatesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate, String city) 
 		{
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\" + city + "filmsByDate.txt")) 
+			String outPutFolder = @"C:\Temp\";
+			System.IO.Directory.CreateDirectory(outPutFolder);
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt")) 
 			{
 				foreach (Dictionary<String, List<TitleSessionInfo>> date in filmsByDate)
 				{ 
@@ -118,6 +121,8 @@ namespace FilmFormatter
 						foreach(TitleSessionInfo cs in value)
 						{ 
 							//find runtime
+							String shortRunTime = "";
+							
 							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle());
 							file.WriteLine(toWrite);
 						}
@@ -128,8 +133,9 @@ namespace FilmFormatter
 
 		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city) 
 		{
-			
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\" + city + "filmsByTitle.txt")) 
+			String outPutFolder = @"C:\Temp\";
+			System.IO.Directory.CreateDirectory(outPutFolder);
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByTitle.txt")) 
 			{
 				foreach (Dictionary<String, List<TitleSessionInfo>> film in filmsByTitle)
 				{
