@@ -59,12 +59,39 @@ namespace FilmFormatter
 					//GIve me everything in Auckland
 					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilms = parseFilmsByTitleForCity("AUCKLAND", rawFilms);
 
-					//
-					//Lets make a datastructure that looks something like a list of cities, each city has a list of titles, 
-					//List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>> cityByTitle = new List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>>>(); 
+					//parse the auckland films and write to file
+					writeOutTitlesToFile(aucklandFilms);
 					Console.WriteLine("Should have broken here");
 				}
 			}
+		}
+
+		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle) 
+		{
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\filmsByTitle.txt")) 
+			{
+				foreach (Dictionary<String, List<TitleSessionInfo>> film in filmsByTitle)
+				{
+					String title = film.Keys.First();
+					Console.WriteLine("Break here");
+					file.WriteLine(title);
+					
+					//Iterate the values -- have to get the values by the ey
+					foreach(List<TitleSessionInfo> value in film.Values)
+					{
+						foreach (TitleSessionInfo currentSession in value) 
+						{ 
+							//finally
+							String toWrite = currentSession.getSessionType() + "\t" + currentSession.getVenue() + "\t" + currentSession.getDate() + "\t" + currentSession.getTime();
+							file.WriteLine(toWrite);
+						}
+					}
+				}
+			}
+			//iterate over each film C:\Temp\filmsByTitle.txt
+			//print the key once
+			//then iterate over the session info
+				
 		}
 
 		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms)
@@ -77,7 +104,7 @@ namespace FilmFormatter
 					//if(list.Any(dic => dic.ContainsKey(item.Name)))
 					if(!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
 					{
-						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string,List<TitleSessionInfo>>() 
+						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
 						{
 							{session.getTitle(), new List<TitleSessionInfo>(){session}}
 						};
