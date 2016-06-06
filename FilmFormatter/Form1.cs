@@ -62,7 +62,7 @@ namespace FilmFormatter
 
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByTitle = parseFilmsByTitleForCity("WELLINGTON", rawFilms);
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByDate = parseFilmsByDateByCity("WELLINGTON", rawFilms);
-					//parse the auckland films and write to file
+					//parse the films and write to file
 					writeOutTitlesToFile(aucklandFilmsByTitle, "Auckland");
 					writeOutDatesToFile(aucklandFilmsByDate, "Auckland");
 					writeOutTitlesToFile(wellingtonFilmsByTitle, "Wellington");
@@ -148,7 +148,7 @@ namespace FilmFormatter
 						foreach (TitleSessionInfo currentSession in value) 
 						{ 
 							//finally
-							String toWrite = currentSession.getSessionType() + "\t" + currentSession.getVenue() + "\t" + currentSession.getDate() + "\t" + currentSession.getTime();
+							String toWrite = currentSession.getSessionType() + "\t" + currentSession.getVenue() + "\t" + currentSession.getDate() + ", " + currentSession.getTime();
 							file.WriteLine(toWrite);
 						}
 					}

@@ -56,6 +56,8 @@ namespace FilmFormatter
 			{"DOWNTOWN CINEMA", "DOWNTOWN"},
 			{"EMBASSY", "EMB"},
 			{"EVENT", "QSt"},
+			{"EVENT MANAKAU", "MK"},
+			{"Event Westgate", "WGATE"},
 			{"FILM ARCHIVE", "NT"},
 			{"HOYTS NORTHLAND 3", "HOYTS"},
 			{"HOYTS NORTHLAND 4", "HOYTS"},
