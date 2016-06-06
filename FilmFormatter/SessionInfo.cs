@@ -71,7 +71,7 @@ namespace FilmFormatter
 			{"TEPAPA", "TP"}
 		};
 
-		public TitleSessionInfo(String title, String venue, String city, DateTime filmDate, TimeSpan screeningTime, String shortFilm)
+		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm)
 		{
 			setScreeningTimeAsALetter(screeningTime, filmDate);
 			formatSessionTime(screeningTime);

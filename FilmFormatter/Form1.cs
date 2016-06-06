@@ -57,8 +57,8 @@ namespace FilmFormatter
 					//OK, now we have the films in memory. Now what?
 
 					//GIve me everything in Auckland
-					List<Dictionary<String, TitleSessionInfo>> aucklandFilms = new List<Dictionary<String, TitleSessionInfo>>();
-				
+					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilms = parseFilmsByTitleForCity("AUCKLAND", rawFilms);
+
 					//
 					//Lets make a datastructure that looks something like a list of cities, each city has a list of titles, 
 					//List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>> cityByTitle = new List<Dictionary<String,List<Dictionary<String,List<TitleSessionInfo>>>>(); 
@@ -67,20 +67,41 @@ namespace FilmFormatter
 			}
 		}
 
-		private List<Dictionary<String, TitleSessionInfo>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms) 
+		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms)
 		{
-			List<Dictionary<String, TitleSessionInfo>> filmByCity = new List<Dictionary<String, TitleSessionInfo>>();
+			List<Dictionary<String, List<TitleSessionInfo>>> filmByCity = new List<Dictionary<String, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms)
 			{
-				if (session.getCity() == city) 
+				if (session.getCity() == city)
 				{ 
-					
+					//if(list.Any(dic => dic.ContainsKey(item.Name)))
+					if(!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
+					{
+						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string,List<TitleSessionInfo>>() 
+						{
+							{session.getTitle(), new List<TitleSessionInfo>(){session}}
+						};
+						filmByCity.Add(toAdd);
+					}
+					else 
+					{ 
+						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmByCity)
+						{
+							if (dict.ContainsKey(session.getTitle())) {
+								List<TitleSessionInfo> toUpdate = dict[session.getTitle()];
+								toUpdate.Add(session);
+								dict[session.getTitle()] = toUpdate;
+
+							}
+						}
+			
+					}
+
 				}
 				
+
 			}
 			return filmByCity;
-
-
 		}
 		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
 		{
@@ -140,7 +161,7 @@ namespace FilmFormatter
 						{
 							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm);
 							//Gotta ignore the blank cells
-							if (sessionInfo.getCity() != "") 
+							if (sessionInfo.getCity() != "")
 							{
 								rawSchedule.Add(sessionInfo);
 							}
