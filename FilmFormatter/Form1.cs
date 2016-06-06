@@ -45,7 +45,7 @@ namespace FilmFormatter
 				using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fs, false))
 				{
 					WorkbookPart workbookPart = myDoc.WorkbookPart;
-					//titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
+					titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
 					//parse main sheet
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
@@ -57,23 +57,83 @@ namespace FilmFormatter
 					//OK, now we have the films in memory. Now what?
 
 					//GIve me everything in Auckland
-					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilms = parseFilmsByTitleForCity("AUCKLAND", rawFilms);
+					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilmsByTitle = parseFilmsByTitleForCity("AUCKLAND", rawFilms);
+					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilmsByDate = parseFilmsByDateByCity("AUCKLAND", rawFilms);
 
+					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByTitle = parseFilmsByTitleForCity("WELLINGTON", rawFilms);
+					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByDate = parseFilmsByDateByCity("WELLINGTON", rawFilms);
 					//parse the auckland films and write to file
-					writeOutTitlesToFile(aucklandFilms);
-					Console.WriteLine("Should have broken here");
+					writeOutTitlesToFile(aucklandFilmsByTitle, "Auckland");
+					writeOutDatesToFile(aucklandFilmsByDate, "Auckland");
+					writeOutTitlesToFile(wellingtonFilmsByTitle, "Wellington");
+					writeOutDatesToFile(wellingtonFilmsByDate, "Wellington");
+					
 				}
 			}
 		}
 
-		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle) 
+		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms) { 
+			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByTitle = new List<Dictionary<String, List<TitleSessionInfo>>>();
+			foreach (TitleSessionInfo session in rawFilms) 
+			{ 
+				if (session.getCity() == city)
+				{
+					if(!filmsByCityByTitle.Any(dic => dic.ContainsKey(session.getDate())))
+					{
+						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
+						{
+							{session.getDate(), new List<TitleSessionInfo>(){session}}
+						};
+						filmsByCityByTitle.Add(toAdd);
+					}
+					else 
+					{
+						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByCityByTitle)
+						{
+							if (dict.ContainsKey(session.getDate()))
+							{
+								List<TitleSessionInfo> toUpdate = dict[session.getDate()];
+								toUpdate.Add(session);
+								dict[session.getTitle()] = toUpdate;
+							}
+						}
+					}
+				}
+			}
+			return filmsByCityByTitle;
+		}
+
+		
+
+		private void writeOutDatesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate, String city) 
 		{
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\filmsByTitle.txt")) 
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\" + city + "filmsByDate.txt")) 
+			{
+				foreach (Dictionary<String, List<TitleSessionInfo>> date in filmsByDate)
+				{ 
+					String newDate = date.Keys.First();
+					file.WriteLine(newDate);
+					foreach (List<TitleSessionInfo> value in date.Values) 
+					{ 
+						foreach(TitleSessionInfo cs in value)
+						{ 
+							//find runtime
+							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle());
+							file.WriteLine(toWrite);
+						}
+					}
+				}
+			}
+		}
+
+		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city) 
+		{
+			
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Temp\" + city + "filmsByTitle.txt")) 
 			{
 				foreach (Dictionary<String, List<TitleSessionInfo>> film in filmsByTitle)
 				{
 					String title = film.Keys.First();
-					Console.WriteLine("Break here");
 					file.WriteLine(title);
 					
 					//Iterate the values -- have to get the values by the ey
@@ -88,10 +148,6 @@ namespace FilmFormatter
 					}
 				}
 			}
-			//iterate over each film C:\Temp\filmsByTitle.txt
-			//print the key once
-			//then iterate over the session info
-				
 		}
 
 		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms)
@@ -204,6 +260,17 @@ namespace FilmFormatter
 			Sheet sheet = workbookpart.Workbook.Descendants<Sheet>().FirstOrDefault(s => s.Name == sheetName);
 			if (sheet == null) throw new Exception(string.Format("Could not find sheet with name {0}", sheetName));
 			else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
+		}
+
+		private int getRunTimeFromTitle(String title)
+		{
+			foreach (Tuple<String, int> tuple in titlesToRunTime)
+			{
+				if (tuple.Item1 == title) { 
+					return tuple.Item2;
+				}
+			}
+			return 0;
 		}
 
 		private List<Tuple<String, int>> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
