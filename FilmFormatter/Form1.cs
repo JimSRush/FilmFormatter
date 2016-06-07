@@ -223,7 +223,7 @@ namespace FilmFormatter
 				String shortFilm = "";
 				int pageNumber = 0;
 
-				if (titleCell != null && venueCell != null && cityCell != null && pageCell !=null)
+				if (titleCell != null && venueCell != null && cityCell != null)
 				{
 					//Time to pluck out the title, venue and city.
 					if (titleCell.DataType != null && venueCell.DataType != null && cityCell.DataType != null)
@@ -236,14 +236,18 @@ namespace FilmFormatter
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
 							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
 							
-							int v;
-							if (int.TryParse(pageCell.InnerText, out v))
+							if(pageCell != null)
 							{
-								if (v != 0)
+								int v;
+								if (int.TryParse(pageCell.InnerText, out v))
 								{
-									pageNumber = v;
+									if (v != 0)
+									{
+										pageNumber = v;
+									}
 								}
 							}
+						
 							
 							//And the time
 							String formattedValue = timeCell.InnerText;
