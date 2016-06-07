@@ -50,7 +50,7 @@ namespace FilmFormatter
 		{ 
 			return this.filmTitle;
 		}
-		private static readonly Dictionary<string, string> venuesToAbbreviations = new Dictionary<string, string>
+		private static readonly Dictionary<string, string> venuesToAbbreviations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			{"ACADEMY", "AC"},
 			{"BERGMAN", "PB"},
