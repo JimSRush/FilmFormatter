@@ -16,6 +16,7 @@ namespace FilmFormatter
 		private string filmTitle;
 		private string shortFilm;
 		private TimeSpan screeningTimeAsTimeSpan;
+		private int pageNumber;
 
 		public String getSessionType()
 		{
@@ -79,7 +80,7 @@ namespace FilmFormatter
 			{"TEPAPA", "TP"}
 		};
 
-		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm)
+		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber)
 		{
 			setScreeningTimeAsALetter(screeningTime, filmDate);
 			formatSessionTime(screeningTime);
@@ -89,6 +90,7 @@ namespace FilmFormatter
 			this.city = city;
 			this.shortFilm = shortFilm;
 			this.screeningTimeAsTimeSpan = screeningTime;
+			this.pageNumber = pageNumber;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{

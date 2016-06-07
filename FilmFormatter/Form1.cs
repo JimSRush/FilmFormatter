@@ -203,6 +203,7 @@ namespace FilmFormatter
 			int venuePosition = 9;
 			int cityPosition = 10;
 			int shortPosition = 4; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
+			int pagePosition = 46; //AU column
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
@@ -212,6 +213,7 @@ namespace FilmFormatter
 				Cell venueCell = r.Elements<Cell>().ElementAtOrDefault(venuePosition);
 				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
 				Cell shortCell = r.Elements<Cell>().ElementAtOrDefault(shortPosition);
+				Cell pageCell = r.Elements<Cell>().ElementAtOrDefault(pagePosition);
 
 				String title = "";
 				String venue = "";
@@ -219,8 +221,9 @@ namespace FilmFormatter
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
+				int pageNumber = 0;
 
-				if (titleCell != null && venueCell != null && cityCell != null)
+				if (titleCell != null && venueCell != null && cityCell != null && pageCell !=null)
 				{
 					//Time to pluck out the title, venue and city.
 					if (titleCell.DataType != null && venueCell.DataType != null && cityCell.DataType != null)
@@ -232,6 +235,16 @@ namespace FilmFormatter
 							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
 							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
+							
+							int v;
+							if (int.TryParse(pageCell.InnerText, out v))
+							{
+								if (v != 0)
+								{
+									pageNumber = v;
+								}
+							}
+							
 							//And the time
 							String formattedValue = timeCell.InnerText;
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
@@ -248,7 +261,7 @@ namespace FilmFormatter
 						}
 						if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 						{
-							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm);
+							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
 							//Gotta ignore the blank cells
 							if (sessionInfo.getCity() != "")
 							{
