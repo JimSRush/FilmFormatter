@@ -15,6 +15,7 @@ namespace FilmFormatter
 		private string time;
 		private string filmTitle;
 		private string shortFilm;
+		private TimeSpan screeningTimeAsTimeSpan;
 
 		public String getSessionType()
 		{
@@ -31,6 +32,10 @@ namespace FilmFormatter
 			return this.date;
 		}
 
+		private TimeSpan getTimeSpan()
+		{ 
+			return this.screeningTimeAsTimeSpan;
+		} 
 		public String getCity()
 		{
 			return this.city;
@@ -55,9 +60,9 @@ namespace FilmFormatter
 			{"DELUXE", "ED"},
 			{"DOWNTOWN CINEMA", "DOWNTOWN"},
 			{"EMBASSY", "EMB"},
-			{"EVENT", "QSt"},
+			{"QUEEN ST", "QSt"},
 			{"EVENT MANAKAU", "MK"},
-			{"Event Westgate", "WGATE"},
+			{"EVENT WESTGATE", "WGATE"},
 			{"FILM ARCHIVE", "NT"},
 			{"HOYTS NORTHLAND 3", "HOYTS"},
 			{"HOYTS NORTHLAND 4", "HOYTS"},
@@ -83,6 +88,7 @@ namespace FilmFormatter
 			this.filmTitle = title;
 			this.city = city;
 			this.shortFilm = shortFilm;
+			this.screeningTimeAsTimeSpan = screeningTime;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{
