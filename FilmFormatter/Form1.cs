@@ -74,6 +74,9 @@ namespace FilmFormatter
 		}
 
 		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms) { 
+			//sort rawfilms
+			//List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
+
 			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<String, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms) 
 			{ 
@@ -235,25 +238,22 @@ namespace FilmFormatter
 							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
 							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
-							
-							if(pageCell != null)
-							{
-								int v;
-								if (int.TryParse(pageCell.InnerText, out v))
-								{
-									if (v != 0)
-									{
-										pageNumber = v;
-									}
-								}
-							}
-						
-							
+														
 							//And the time
 							String formattedValue = timeCell.InnerText;
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
 							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
 							//AAAAaaand the date
+							if(pageCell != null )
+							{
+								{
+									int v;
+									if (int.TryParse(pageCell.InnerText, out pageNumber))
+									{
+										//whew
+									}
+								}
+							}
 							int value;
 							if (int.TryParse(dateCell.InnerText, out value))
 							{

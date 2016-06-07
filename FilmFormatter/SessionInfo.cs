@@ -33,7 +33,7 @@ namespace FilmFormatter
 			return this.date;
 		}
 
-		private TimeSpan getTimeSpan()
+		public TimeSpan getTimeSpan()
 		{ 
 			return this.screeningTimeAsTimeSpan;
 		} 
