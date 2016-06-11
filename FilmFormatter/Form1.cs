@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -68,18 +69,19 @@ namespace FilmFormatter
 					writeOutTitlesToFile(wellingtonFilmsByTitle, "Wellington");
 					writeOutDatesToFile(wellingtonFilmsByDate, "Wellington");
 					Application.Exit();
-					
+
 				}
 			}
 		}
 
-		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms) { 
+		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
+		{
 			//sort rawfilms
 			//List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
 
 			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<String, List<TitleSessionInfo>>>();
-			foreach (TitleSessionInfo session in rawFilms) 
-			{ 
+			foreach (TitleSessionInfo session in rawFilms)
+			{
 				if (session.getCity() == city)
 				{
 					if (!filmsByCityByDate.Any(dic => dic.ContainsKey(session.getDate())))
@@ -90,7 +92,7 @@ namespace FilmFormatter
 						};
 						filmsByCityByDate.Add(toAdd);
 					}
-					else 
+					else
 					{
 						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByCityByDate)
 						{
@@ -107,25 +109,25 @@ namespace FilmFormatter
 			return filmsByCityByDate;
 		}
 
-		
 
-		private void writeOutDatesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate, String city) 
+
+		private void writeOutDatesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate, String city)
 		{
 			String outPutFolder = @"C:\Temp\";
 			System.IO.Directory.CreateDirectory(outPutFolder);
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt")) 
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt"))
 			{
 				foreach (Dictionary<String, List<TitleSessionInfo>> date in filmsByDate)
-				{ 
+				{
 					String newDate = date.Keys.First();
 					file.WriteLine(newDate);
-					foreach (List<TitleSessionInfo> value in date.Values) 
-					{ 
-						foreach(TitleSessionInfo cs in value)
-						{ 
+					foreach (List<TitleSessionInfo> value in date.Values)
+					{
+						foreach (TitleSessionInfo cs in value)
+						{
 							//find runtime
 							String shortRunTime = "";
-							
+
 							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle());
 							file.WriteLine(toWrite);
 						}
@@ -134,22 +136,22 @@ namespace FilmFormatter
 			}
 		}
 
-		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city) 
+		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city)
 		{
 			String outPutFolder = @"C:\Temp\";
 			System.IO.Directory.CreateDirectory(outPutFolder);
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByTitle.txt")) 
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByTitle.txt"))
 			{
 				foreach (Dictionary<String, List<TitleSessionInfo>> film in filmsByTitle)
 				{
 					String title = film.Keys.First();
 					file.WriteLine(title);
-					
+
 					//Iterate the values -- have to get the values by the ey
-					foreach(List<TitleSessionInfo> value in film.Values)
+					foreach (List<TitleSessionInfo> value in film.Values)
 					{
-						foreach (TitleSessionInfo currentSession in value) 
-						{ 
+						foreach (TitleSessionInfo currentSession in value)
+						{
 							//finally
 							String toWrite = currentSession.getSessionType() + "\t" + currentSession.getVenue() + "\t" + currentSession.getDate() + ", " + currentSession.getTime();
 							file.WriteLine(toWrite);
@@ -165,9 +167,9 @@ namespace FilmFormatter
 			foreach (TitleSessionInfo session in rawFilms)
 			{
 				if (session.getCity() == city)
-				{ 
+				{
 					//if(list.Any(dic => dic.ContainsKey(item.Name)))
-					if(!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
+					if (!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
 					{
 						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
 						{
@@ -175,22 +177,23 @@ namespace FilmFormatter
 						};
 						filmByCity.Add(toAdd);
 					}
-					else 
-					{ 
+					else
+					{
 						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmByCity)
 						{
-							if (dict.ContainsKey(session.getTitle())) {
+							if (dict.ContainsKey(session.getTitle()))
+							{
 								List<TitleSessionInfo> toUpdate = dict[session.getTitle()];
 								toUpdate.Add(session);
 								dict[session.getTitle()] = toUpdate;
 
 							}
 						}
-			
+
 					}
 
 				}
-				
+
 
 			}
 			return filmByCity;
@@ -200,13 +203,13 @@ namespace FilmFormatter
 			//TODO: It should really be just a list of session objects
 			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
-			int titlePosition = 3;
-			int datePosition = 6;
-			int timePosition = 7;
-			int venuePosition = 9;
-			int cityPosition = 10;
-			int shortPosition = 4; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
-			int pagePosition = 46; //AU column
+			int titlePosition = 3; //3
+			int datePosition = 6;//6
+			int timePosition = 7;//7
+			int venuePosition = 9;//9
+			int cityPosition = 10;//10
+			int shortPosition = 4; //5//this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
+			int pagePosition = 11; ///AU column
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
@@ -217,14 +220,14 @@ namespace FilmFormatter
 				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
 				Cell shortCell = r.Elements<Cell>().ElementAtOrDefault(shortPosition);
 				Cell pageCell = r.Elements<Cell>().ElementAtOrDefault(pagePosition);
-
+				Console.WriteLine("The size of R is " + r.Count());
 				String title = "";
 				String venue = "";
 				String city = "";
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
-				int pageNumber = 0;
+				int pageNumber = -1;
 
 				if (titleCell != null && venueCell != null && cityCell != null)
 				{
@@ -238,23 +241,23 @@ namespace FilmFormatter
 							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
 							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
 							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
-														
+
 							//And the time
 							String formattedValue = timeCell.InnerText;
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
 							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
-							//AAAAaaand the date
-							if(pageCell != null )
+							if (pageCell != null)
 							{
+								int v;
+								if (Int32.TryParse(pageCell.InnerText, out v))
 								{
-									int v;
-									if (int.TryParse(pageCell.InnerText, out pageNumber))
-									{
-										//whew
-									}
+									pageNumber = v;
 								}
 							}
+							//AAAAaaand the date
+
 							int value;
+
 							if (int.TryParse(dateCell.InnerText, out value))
 							{
 								if (value != 0)
@@ -262,15 +265,18 @@ namespace FilmFormatter
 									newDate = DateTime.FromOADate(value + 1462);
 								}
 							}
-						}
-						if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
-						{
-							TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
-							//Gotta ignore the blank cells
-							if (sessionInfo.getCity() != "")
+							if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 							{
-								rawSchedule.Add(sessionInfo);
+							
+								Console.WriteLine("Title: " + title + "Pagecell: " + pageCell);
+								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
+								//Gotta ignore the blank cells
+								if (sessionInfo.getCity() != "")
+								{
+									rawSchedule.Add(sessionInfo);
+								}
 							}
+
 						}
 					}
 				}
@@ -289,7 +295,8 @@ namespace FilmFormatter
 		{
 			foreach (Tuple<String, int> tuple in titlesToRunTime)
 			{
-				if (tuple.Item1 == title) { 
+				if (tuple.Item1 == title)
+				{
 					return tuple.Item2;
 				}
 			}
