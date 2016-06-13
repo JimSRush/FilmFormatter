@@ -64,10 +64,14 @@ namespace FilmFormatter
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByTitle = parseFilmsByTitleForCity("WELLINGTON", rawFilms);
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByDate = parseFilmsByDateByCity("WELLINGTON", rawFilms);
 					//parse the films and write to file
-					writeOutTitlesToFile(aucklandFilmsByTitle, "Auckland");
-					writeOutDatesToFile(aucklandFilmsByDate, "Auckland");
-					writeOutTitlesToFile(wellingtonFilmsByTitle, "Wellington");
-					writeOutDatesToFile(wellingtonFilmsByDate, "Wellington");
+					List<String> cities = new List<String> {"AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON"};
+					
+					foreach (String city in cities) {
+						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilms);
+						List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilms);
+						writeOutTitlesToFile(filmsByTitle, city);
+						writeOutDatesToFile(filmsByDate, city);
+					}
 					Application.Exit();
 
 				}
@@ -106,6 +110,9 @@ namespace FilmFormatter
 					}
 				}
 			}
+			//sort here
+			////List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
+			//sortedFilmsByDate List<Dictionary<String, List<TitleSessionInfo>>> = 
 			return filmsByCityByDate;
 		}
 
@@ -128,7 +135,7 @@ namespace FilmFormatter
 							//find runtime
 							String shortRunTime = "";
 
-							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle());
+							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
 							file.WriteLine(toWrite);
 						}
 					}
@@ -204,12 +211,12 @@ namespace FilmFormatter
 			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
 			int titlePosition = 3; //3
-			int datePosition = 6;//6
-			int timePosition = 7;//7
-			int venuePosition = 9;//9
-			int cityPosition = 10;//10
-			int shortPosition = 4; //5//this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
-			int pagePosition = 11; ///AU column
+			int datePosition = 8;//6
+			int timePosition = 9;//7
+			int venuePosition = 11;//9
+			int cityPosition = 12;//10
+			int shortPosition = 6; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
+			int pagePosition = 25; ///AU column
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{

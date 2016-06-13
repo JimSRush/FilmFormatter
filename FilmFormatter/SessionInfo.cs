@@ -47,6 +47,10 @@ namespace FilmFormatter
 			return this.time;
 		}
 
+		public int getPageNumber() 
+		{ 
+			return this.pageNumber;
+		}
 		public string getTitle() 
 		{ 
 			return this.filmTitle;
