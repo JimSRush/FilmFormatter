@@ -18,6 +18,11 @@ namespace FilmFormatter
 		private TimeSpan screeningTimeAsTimeSpan;
 		private int pageNumber;
 
+
+		public string getShort()
+		{ 
+			return this.shortFilm;
+		}
 		public String getSessionType()
 		{
 			return this.sessionType;

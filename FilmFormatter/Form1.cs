@@ -180,8 +180,24 @@ namespace FilmFormatter
 							//find runtime
 							String shortRunTime = "";
 
-							String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
-							file.WriteLine(toWrite);
+							if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
+							{
+								String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
+								file.WriteLine(toWrite);
+							} else if (cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase) 
+								&& !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase) 
+								&& !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase) 
+								&& !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase) 
+								&& !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)) 
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
+							else 
+							{
+								String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
+								file.WriteLine(toWrite);
+							}
 						}
 					}
 				}
