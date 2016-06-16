@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml;
@@ -64,9 +65,10 @@ namespace FilmFormatter
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByTitle = parseFilmsByTitleForCity("WELLINGTON", rawFilms);
 					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByDate = parseFilmsByDateByCity("WELLINGTON", rawFilms);
 					//parse the films and write to file
-					List<String> cities = new List<String> {"AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON"};
-					
-					foreach (String city in cities) {
+					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON" };
+
+					foreach (String city in cities)
+					{
 						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilms);
 						List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilms);
 						writeOutTitlesToFile(filmsByTitle, city);
@@ -74,6 +76,49 @@ namespace FilmFormatter
 					}
 					Application.Exit();
 
+				}
+			}
+		}
+
+		private static string GetColumnAddress(string cellReference)
+		{
+			//Create a regular expression to get column address letters.
+			Regex regex = new Regex("[A-Za-z]+");
+			Match match = regex.Match(cellReference);
+			return match.Value;
+		}  
+
+		private static IEnumerable<Cell> GetCellsForRow(Row row, List<string> columnLetters)
+		{
+			int workIdx = 0;
+			foreach (var cell in row.Descendants<Cell>())
+			{
+				//Get letter part of cell address
+				var cellLetter = GetColumnAddress(cell.CellReference);
+
+				//Get column index of the matched cell  
+				int currentActualIdx = columnLetters.IndexOf(cellLetter);
+
+				//Add empty cell if work index smaller than actual index
+				for (; workIdx < currentActualIdx; workIdx++)
+				{
+					var emptyCell = new Cell() { DataType = null, CellValue = new CellValue(string.Empty) };
+					yield return emptyCell;
+				}
+
+				//Return cell with data from Excel row
+				yield return cell;
+				workIdx++;
+
+				//Check if it's ending cell but there still is any unmatched columnLetters item   
+				if (cell == row.LastChild)
+				{
+					//Append empty cells to enumerable 
+					for (; workIdx < columnLetters.Count(); workIdx++)
+					{
+						var emptyCell = new Cell() { DataType = null, CellValue = new CellValue(string.Empty) };
+						yield return emptyCell;
+					}
 				}
 			}
 		}
@@ -205,6 +250,8 @@ namespace FilmFormatter
 			}
 			return filmByCity;
 		}
+
+
 		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
 		{
 			//TODO: It should really be just a list of session objects
@@ -217,17 +264,21 @@ namespace FilmFormatter
 			int cityPosition = 12;//10
 			int shortPosition = 6; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 			int pagePosition = 25; ///AU column
-
+			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+			
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(titlePosition);
-				Cell dateCell = r.Elements<Cell>().ElementAtOrDefault(datePosition);
-				Cell timeCell = r.Elements<Cell>().ElementAtOrDefault(timePosition);
-				Cell venueCell = r.Elements<Cell>().ElementAtOrDefault(venuePosition);
-				Cell cityCell = r.Elements<Cell>().ElementAtOrDefault(cityPosition);
-				Cell shortCell = r.Elements<Cell>().ElementAtOrDefault(shortPosition);
-				Cell pageCell = r.Elements<Cell>().ElementAtOrDefault(pagePosition);
-				Console.WriteLine("The size of R is " + r.Count());
+			List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
+
+
+				Cell titleCell = row.ElementAtOrDefault(titlePosition);
+				Cell dateCell = row.ElementAtOrDefault(datePosition);
+				Cell timeCell = row.ElementAtOrDefault(timePosition);
+				Cell venueCell = row.ElementAtOrDefault(venuePosition);
+				Cell cityCell = row.ElementAtOrDefault(cityPosition);
+				Cell shortCell = row.ElementAtOrDefault(shortPosition);
+				Cell pageCell = row.ElementAtOrDefault(pagePosition);
+				//Console.WriteLine("The size of R is " + r.Count());
 				String title = "";
 				String venue = "";
 				String city = "";
@@ -235,6 +286,7 @@ namespace FilmFormatter
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
 				int pageNumber = -1;
+				
 
 				if (titleCell != null && venueCell != null && cityCell != null)
 				{
@@ -274,7 +326,7 @@ namespace FilmFormatter
 							}
 							if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 							{
-							
+
 								Console.WriteLine("Title: " + title + "Pagecell: " + pageCell);
 								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
 								//Gotta ignore the blank cells
