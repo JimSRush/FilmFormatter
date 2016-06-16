@@ -59,18 +59,14 @@ namespace FilmFormatter
 					//OK, now we have the films in memory. Now what?
 
 					//GIve me everything in Auckland
-					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilmsByTitle = parseFilmsByTitleForCity("AUCKLAND", rawFilms);
-					List<Dictionary<String, List<TitleSessionInfo>>> aucklandFilmsByDate = parseFilmsByDateByCity("AUCKLAND", rawFilms);
-
-					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByTitle = parseFilmsByTitleForCity("WELLINGTON", rawFilms);
-					List<Dictionary<String, List<TitleSessionInfo>>> wellingtonFilmsByDate = parseFilmsByDateByCity("WELLINGTON", rawFilms);
+	
 					//parse the films and write to file
 					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON" };
 
 					foreach (String city in cities)
 					{
 						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilms);
-						List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilms);
+						List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilms);
 						writeOutTitlesToFile(filmsByTitle, city);
 						writeOutDatesToFile(filmsByDate, city);
 					}
@@ -123,55 +119,59 @@ namespace FilmFormatter
 			}
 		}
 
-		private List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
+		private List<Dictionary<DateTime, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
 		{
 			//sort rawfilms
 			//List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
 
-			List<Dictionary<String, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<String, List<TitleSessionInfo>>>();
+			List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<DateTime, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms)
 			{
 				if (session.getCity() == city)
 				{
-					if (!filmsByCityByDate.Any(dic => dic.ContainsKey(session.getDate())))
+					if (!filmsByCityByDate.Any(dic => dic.ContainsKey(session.getDateTimeAsDate())))
 					{
-						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
+						Dictionary<DateTime, List<TitleSessionInfo>> toAdd = new Dictionary<DateTime, List<TitleSessionInfo>>() 
 						{
-							{session.getDate(), new List<TitleSessionInfo>(){session}}
+							{session.getDateTimeAsDate(), new List<TitleSessionInfo>(){session}}
 						};
 						filmsByCityByDate.Add(toAdd);
 					}
 					else
 					{
-						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByCityByDate)
+						foreach (Dictionary<DateTime, List<TitleSessionInfo>> dict in filmsByCityByDate)
 						{
-							if (dict.ContainsKey(session.getDate()))
+							if (dict.ContainsKey(session.getDateTimeAsDate()))
 							{
-								List<TitleSessionInfo> toUpdate = dict[session.getDate()];
+								List<TitleSessionInfo> toUpdate = dict[session.getDateTimeAsDate()];
 								toUpdate.Add(session);
-								dict[session.getDate()] = toUpdate;
+								dict[session.getDateTimeAsDate()] = toUpdate;
 							}
 						}
 					}
 				}
 			}
 			//sort here
+			//sort
+		
+			//loop through 
 			////List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
-			//sortedFilmsByDate List<Dictionary<String, List<TitleSessionInfo>>> = 
+			//sortedFilmsByDate List<Dictionary<DateTime, List<TitleSessionInfo>>> = 
 			return filmsByCityByDate;
 		}
 
 
 
-		private void writeOutDatesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByDate, String city)
+		private void writeOutDatesToFile(List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate, String city)
 		{
 			String outPutFolder = @"C:\Temp\";
 			System.IO.Directory.CreateDirectory(outPutFolder);
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt"))
 			{
-				foreach (Dictionary<String, List<TitleSessionInfo>> date in filmsByDate)
+				foreach (Dictionary<DateTime, List<TitleSessionInfo>> date in filmsByDate)
 				{
-					String newDate = date.Keys.First();
+					String newDate = setDateAsString(date.Keys.First());
+					
 					file.WriteLine(newDate);
 					foreach (List<TitleSessionInfo> value in date.Values)
 					{
@@ -184,7 +184,7 @@ namespace FilmFormatter
 							{
 								String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
 								file.WriteLine(toWrite);
-							} else if (cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase) 
+							} else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase) 
 								&& !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase) 
 								&& !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase) 
 								&& !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase) 
@@ -203,6 +203,12 @@ namespace FilmFormatter
 				}
 			}
 		}
+
+		private String setDateAsString(DateTime filmDate)
+		{
+			return String.Format("{0:dddd d MMMM}", filmDate);
+		}
+
 
 		private void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city)
 		{

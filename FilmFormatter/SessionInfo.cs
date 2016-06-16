@@ -17,6 +17,7 @@ namespace FilmFormatter
 		private string shortFilm;
 		private TimeSpan screeningTimeAsTimeSpan;
 		private int pageNumber;
+		private DateTime dateTimeDate;
 
 
 		public string getShort()
@@ -28,6 +29,10 @@ namespace FilmFormatter
 			return this.sessionType;
 		}
 
+		public DateTime getDateTimeAsDate()
+		{ 
+			return this.dateTimeDate;
+		}
 		public String getVenue()
 		{
 			return this.venue;
@@ -100,6 +105,7 @@ namespace FilmFormatter
 			this.shortFilm = shortFilm;
 			this.screeningTimeAsTimeSpan = screeningTime;
 			this.pageNumber = pageNumber;
+			this.dateTimeDate = filmDate;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{
