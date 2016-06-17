@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Entity;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -62,11 +64,11 @@ namespace FilmFormatter
 	
 					//parse the films and write to file
 					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON" };
-
+					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in cities)
 					{
 						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilms);
-						List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilms);
+						List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilmsForOrderByDate);
 						writeOutTitlesToFile(filmsByTitle, city);
 						writeOutDatesToFile(filmsByDate, city);
 					}
@@ -362,6 +364,9 @@ namespace FilmFormatter
 					}
 				}
 			}
+
+			//sort by date then time
+			
 			return rawSchedule;
 		}
 
@@ -388,11 +393,13 @@ namespace FilmFormatter
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
 			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();
+			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				Cell titleCell = r.Elements<Cell>().ElementAtOrDefault(2);
-				Cell runningTimeCell = r.Elements<Cell>().ElementAtOrDefault(10);
+				List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
+				Cell titleCell = row.ElementAtOrDefault(2);
+				Cell runningTimeCell = row.ElementAtOrDefault(10);
 
 				if (titleCell != null)
 				{

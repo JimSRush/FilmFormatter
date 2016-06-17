@@ -8,3 +8,4 @@ C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.exe
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.pdb
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.Form1.resources
 C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\obj\Debug\FilmFormatter.csprojResolveAssemblyReference.cache
+C:\Users\Jimbo\Desktop\FilmFormatter\FilmFormatter\bin\Debug\System.Linq.Dynamic.dll
