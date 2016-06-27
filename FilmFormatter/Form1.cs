@@ -317,7 +317,7 @@ namespace FilmFormatter
 					//Time to pluck out the title, venue and city.
 					if (titleCell.DataType != null && venueCell.DataType != null && cityCell.DataType != null)
 					{
-						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString)
+						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString && timeCell.InnerText != "")
 						{
 							//Here, we have to get the text for each. TODO put this in a method.
 							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
