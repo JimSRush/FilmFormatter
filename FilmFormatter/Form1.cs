@@ -22,6 +22,7 @@ namespace FilmFormatter
 	{
 
 		List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
+		Dictionary<String, List<String>> citiesToVenues = new Dictionary<String, List<String>>();
 
 		public Form1()
 		{
@@ -61,7 +62,7 @@ namespace FilmFormatter
 					//OK, now we have the films in memory. Now what?
 
 					//GIve me everything in Auckland
-	
+
 					//parse the films and write to file
 					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON" };
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
@@ -84,7 +85,7 @@ namespace FilmFormatter
 			Regex regex = new Regex("[A-Za-z]+");
 			Match match = regex.Match(cellReference);
 			return match.Value;
-		}  
+		}
 
 		private static IEnumerable<Cell> GetCellsForRow(Row row, List<string> columnLetters)
 		{
@@ -155,7 +156,7 @@ namespace FilmFormatter
 			}
 			//sort here
 			//sort
-		
+
 			//loop through 
 			////List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
 			//sortedFilmsByDate List<Dictionary<DateTime, List<TitleSessionInfo>>> = 
@@ -173,7 +174,7 @@ namespace FilmFormatter
 				foreach (Dictionary<DateTime, List<TitleSessionInfo>> date in filmsByDate)
 				{
 					String newDate = setDateAsString(date.Keys.First());
-					
+
 					file.WriteLine(newDate);
 					foreach (List<TitleSessionInfo> value in date.Values)
 					{
@@ -181,25 +182,51 @@ namespace FilmFormatter
 						{
 							//find runtime
 							String shortRunTime = "";
-
-							if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
-							{
-								String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
-								file.WriteLine(toWrite);
-							} else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase) 
-								&& !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase) 
-								&& !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase) 
-								&& !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase) 
-								&& !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)) 
+							//For the bigger cities
+							if (citiesToVenues[city].Count > 1) {
+								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
+								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
 								{
 									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
-							else 
-							{
-								String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
-								file.WriteLine(toWrite);
+								else
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + "\t(" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
 							}
+							else { //this is for the single venuie cities
+								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "		p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
+								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
+								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "		p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
+								else
+								{
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "		p" + cs.getPageNumber();
+									file.WriteLine(toWrite);
+								}
+							}
+
+						
 						}
 					}
 				}
@@ -289,10 +316,10 @@ namespace FilmFormatter
 			int shortPosition = 6; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 			int pagePosition = 25; ///AU column
 			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
-			
+
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-			List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
+				List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
 
 
 				Cell titleCell = row.ElementAtOrDefault(titlePosition);
@@ -310,7 +337,7 @@ namespace FilmFormatter
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
 				int pageNumber = -1;
-				
+
 
 				if (titleCell != null && venueCell != null && cityCell != null)
 				{
@@ -366,8 +393,35 @@ namespace FilmFormatter
 			}
 
 			//sort by date then time
+	
 			
+			setCitiesToVenues(rawSchedule);
+
 			return rawSchedule;
+		}
+
+		private void setCitiesToVenues (List<TitleSessionInfo> rawSchedule) 
+		{
+
+		//Dictionary<String, String> citiesToVenues = new Dictionary<String, String>();
+		foreach (TitleSessionInfo session in rawSchedule)
+			{
+				if (!citiesToVenues.ContainsKey(session.getCity()))
+				{
+					List<String> values = new List<String>();
+					values.Add(session.getVenue());
+					citiesToVenues.Add(session.getCity(), values);
+				}
+				else
+				{ //the city exists, so we need to check for the value in the values 
+					if (!citiesToVenues[session.getCity()].Contains(session.getVenue()))
+					{
+						citiesToVenues[session.getCity()].Add(session.getVenue());
+					}
+
+				}
+			}
+			Console.WriteLine("hey");
 		}
 
 		private WorksheetPart GetWorkSheetFromSheetName(WorkbookPart workbookpart, String sheetName)

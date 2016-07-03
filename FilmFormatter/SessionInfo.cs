@@ -125,7 +125,7 @@ namespace FilmFormatter
 		private void formatSessionTime(TimeSpan screeningTime)
 		{
 			DateTime dateTime = new DateTime(screeningTime.Ticks); //back to datetime we go
-			String formattedTime = dateTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+			String formattedTime = dateTime.ToString("h.mm tt", System.Globalization.CultureInfo.InvariantCulture);
 			
 			this.time = formattedTime.ToLower();
 		}
