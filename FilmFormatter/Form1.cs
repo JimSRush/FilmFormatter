@@ -336,7 +336,7 @@ namespace FilmFormatter
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
-				int pageNumber = -1;
+				int pageNumber = 1;
 
 
 				if (titleCell != null && venueCell != null && cityCell != null)

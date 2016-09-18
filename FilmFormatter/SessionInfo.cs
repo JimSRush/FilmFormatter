@@ -69,7 +69,7 @@ namespace FilmFormatter
 		{
 			{"ACADEMY", "AC"},
 			{"BERGMAN", "PB"},
-			{"CINEMA GOLD", "Cinema Gold"},
+			{"CINEMA GOLD", "Havelock Nth"},
 			{"CITY GALLERY", "CG"},
 			{"CIVIC", "CIVIC"},
 			{"DELUXE", "ED"},
@@ -109,7 +109,7 @@ namespace FilmFormatter
 		}
 		private void setDateAsString(DateTime filmDate)
 		{
-			this.date = String.Format("{0:dddd d MMMM}", filmDate);
+			this.date = String.Format("{0:ddd d MMMM}", filmDate);
 		}
 
 		private void setAbbreviatedVenue(String venue)
