@@ -182,12 +182,15 @@ namespace FilmFormatter
 						{
 							//find runtime
 							String shortRunTime = "";
-							//For the bigger cities
+								//For the bigger cities
 							if (citiesToVenues[city].Count > 1) {
 								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "		p" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "\tp" + cs.getPageNumber();
 									file.WriteLine(toWrite);
+									Console.WriteLine(cs.getTime() + cs.getTitle());
+									
+									
 								}
 								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
@@ -195,20 +198,23 @@ namespace FilmFormatter
 								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\tp" + cs.getPageNumber();
 									file.WriteLine(toWrite);
+									
 								}
 								else
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "	p" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\tp" + cs.getPageNumber();
 									file.WriteLine(toWrite);
+									
 								}
+								
 							}
 							else { //this is for the single venuie cities
 								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "		p" + cs.getPageNumber();
-									file.WriteLine(toWrite);
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\tp" + cs.getPageNumber();
+									
 								}
 								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
@@ -216,12 +222,12 @@ namespace FilmFormatter
 								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "		p" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "\tp" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
 								else
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "		p" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\tp" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
 							}
