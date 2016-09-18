@@ -109,7 +109,7 @@ namespace FilmFormatter
 		}
 		private void setDateAsString(DateTime filmDate)
 		{
-			this.date = String.Format("{0:ddd d MMMM}", filmDate);
+			this.date = String.Format("{0:ddd d MMM}", filmDate);
 		}
 
 		private void setAbbreviatedVenue(String venue)
