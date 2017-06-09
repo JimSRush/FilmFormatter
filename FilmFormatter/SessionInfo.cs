@@ -79,6 +79,8 @@ namespace FilmFormatter
 			{"QUEEN ST", "QST"},
 			{"EVENT MANAKAU", "MK"},
 			{"EVENT WESTGATE", "WGATE"},
+			{"HOLLYWOOD", "HWOOD"},
+			{"ASB WATERFRONT THEATRE", "AWT"},
 			{"HOYTS NORTHLAND 3", "Northlands"},
 			{"HOYTS NORTHLAND 4", "Northlands"},
 			{"HOYTS NORTHLAND 2", "Northlands"},

@@ -231,8 +231,6 @@ namespace FilmFormatter
 									file.WriteLine(toWrite);
 								}
 							}
-
-						
 						}
 					}
 				}
@@ -302,8 +300,6 @@ namespace FilmFormatter
 					}
 
 				}
-
-
 			}
 			return filmByCity;
 		}
