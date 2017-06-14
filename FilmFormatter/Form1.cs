@@ -316,7 +316,7 @@ namespace FilmFormatter
 			int venuePosition = 11;//9
 			int cityPosition = 12;//10
 			int shortPosition = 6; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
-			int pagePosition = 25; ///AU column
+			int pagePosition = 27; ///AB column
 			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
 
 			foreach (Row r in sheetData.Elements<Row>())
