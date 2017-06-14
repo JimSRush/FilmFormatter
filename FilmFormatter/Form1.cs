@@ -227,7 +227,7 @@ namespace FilmFormatter
 								}
 								else
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
 							}
