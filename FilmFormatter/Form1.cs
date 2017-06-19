@@ -186,7 +186,7 @@ namespace FilmFormatter
 							if (citiesToVenues[city].Count > 1) {
 								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 									Console.WriteLine(cs.getTime() + cs.getTitle());
 									
@@ -198,13 +198,13 @@ namespace FilmFormatter
 								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 									
 								}
 								else
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 									
 								}
@@ -213,7 +213,7 @@ namespace FilmFormatter
 							else { //this is for the single venuie cities
 								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
 									
 								}
 								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
@@ -222,7 +222,7 @@ namespace FilmFormatter
 								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
 								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "\tp" + cs.getPageNumber();
+									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
 								else
