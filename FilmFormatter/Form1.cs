@@ -79,48 +79,6 @@ namespace FilmFormatter
 			}
 		}
 
-		private static string GetColumnAddress(string cellReference)
-		{
-			//Create a regular expression to get column address letters.
-			Regex regex = new Regex("[A-Za-z]+");
-			Match match = regex.Match(cellReference);
-			return match.Value;
-		}
-
-		private static IEnumerable<Cell> GetCellsForRow(Row row, List<string> columnLetters)
-		{
-			int workIdx = 0;
-			foreach (var cell in row.Descendants<Cell>())
-			{
-				//Get letter part of cell address
-				var cellLetter = GetColumnAddress(cell.CellReference);
-
-				//Get column index of the matched cell  
-				int currentActualIdx = columnLetters.IndexOf(cellLetter);
-
-				//Add empty cell if work index smaller than actual index
-				for (; workIdx < currentActualIdx; workIdx++)
-				{
-					var emptyCell = new Cell() { DataType = null, CellValue = new CellValue(string.Empty) };
-					yield return emptyCell;
-				}
-
-				//Return cell with data from Excel row
-				yield return cell;
-				workIdx++;
-
-				//Check if it's ending cell but there still is any unmatched columnLetters item   
-				if (cell == row.LastChild)
-				{
-					//Append empty cells to enumerable 
-					for (; workIdx < columnLetters.Count(); workIdx++)
-					{
-						var emptyCell = new Cell() { DataType = null, CellValue = new CellValue(string.Empty) };
-						yield return emptyCell;
-					}
-				}
-			}
-		}
 
 		private List<Dictionary<DateTime, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
 		{
@@ -305,12 +263,13 @@ namespace FilmFormatter
 		}
 
 
+
 		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
 		{
-			//TODO: It should really be just a list of session objects
 			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
-			int titlePosition = 3; //3
+			//int titlePosition = 3; //3
+			int titlePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("C");
 			int datePosition = 8;//6
 			int timePosition = 9;//7
 			int venuePosition = 11;//9
@@ -321,8 +280,7 @@ namespace FilmFormatter
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
-
+				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r, columnLetters).ToList();
 
 				Cell titleCell = row.ElementAtOrDefault(titlePosition);
 				Cell dateCell = row.ElementAtOrDefault(datePosition);
@@ -393,10 +351,6 @@ namespace FilmFormatter
 					}
 				}
 			}
-
-			//sort by date then time
-	
-			
 			setCitiesToVenues(rawSchedule);
 
 			return rawSchedule;
@@ -404,8 +358,6 @@ namespace FilmFormatter
 
 		private void setCitiesToVenues (List<TitleSessionInfo> rawSchedule) 
 		{
-
-		//Dictionary<String, String> citiesToVenues = new Dictionary<String, String>();
 		foreach (TitleSessionInfo session in rawSchedule)
 			{
 				if (!citiesToVenues.ContainsKey(session.getCity()))
@@ -453,7 +405,7 @@ namespace FilmFormatter
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				List<Cell> row = GetCellsForRow(r, columnLetters).ToList();
+				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r, columnLetters).ToList();
 				Cell titleCell = row.ElementAtOrDefault(2);
 				Cell runningTimeCell = row.ElementAtOrDefault(10);
 
