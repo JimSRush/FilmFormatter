@@ -37,9 +37,7 @@ namespace FilmFormatter
 		private void button1_Click(object sender, EventArgs e)
 		{
 			DialogResult result = openFileDialog1.ShowDialog();
-			Console.WriteLine("I've just clicked a button");
 			String file = openFileDialog1.FileName;
-			Console.WriteLine("File is called " + file);
 			loadFile(file);
 		}
 
@@ -54,21 +52,18 @@ namespace FilmFormatter
 					//parse main sheet
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
-					//parse by title -- List<Dictionary<title, titleSession>() 
-					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();					//
+					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();	
 
 					rawFilms = parseFilms(sheetData, workbookPart);
-
-					//OK, now we have the films in memory. Now what?
-
-					//GIve me everything in Auckland
-
+					Console.WriteLine("Size of films");
+					Console.WriteLine(rawFilms.Count);
 					//parse the films and write to file
-					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON" };
+					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
+					
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in cities)
 					{
-						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilms);
+						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilmsForOrderByDate);
 						List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilmsForOrderByDate);
 						writeOutTitlesToFile(filmsByTitle, city);
 						writeOutDatesToFile(filmsByDate, city);
@@ -82,9 +77,6 @@ namespace FilmFormatter
 
 		private List<Dictionary<DateTime, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
 		{
-			//sort rawfilms
-			//List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
-
 			List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<DateTime, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms)
 			{
@@ -112,12 +104,7 @@ namespace FilmFormatter
 					}
 				}
 			}
-			//sort here
-			//sort
 
-			//loop through 
-			////List<TitleSessionInfo> newRawFilms = rawFilms.OrderBy(x => x.getTimeSpan()).ToList();
-			//sortedFilmsByDate List<Dictionary<DateTime, List<TitleSessionInfo>>> = 
 			return filmsByCityByDate;
 		}
 
@@ -146,9 +133,6 @@ namespace FilmFormatter
 								{
 									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
-									Console.WriteLine(cs.getTime() + cs.getTitle());
-									
-									
 								}
 								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
 								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
@@ -233,7 +217,6 @@ namespace FilmFormatter
 			{
 				if (session.getCity() == city)
 				{
-					//if(list.Any(dic => dic.ContainsKey(item.Name)))
 					if (!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
 					{
 						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
@@ -268,14 +251,13 @@ namespace FilmFormatter
 		{
 			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
-			//int titlePosition = 3; //3
-			int titlePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("C");
-			int datePosition = 8;//6
-			int timePosition = 9;//7
-			int venuePosition = 11;//9
-			int cityPosition = 12;//10
-			int shortPosition = 6; //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
-			int pagePosition = 27; ///AB column
+			int titlePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("D");
+			int datePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("I");//6
+			int timePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("J");//7
+			int venuePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("L");//9
+			int cityPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("N");//10
+			int shortPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("G"); //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
+			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BG"); ///AB column
 			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
 
 			foreach (Row r in sheetData.Elements<Row>())
@@ -289,7 +271,7 @@ namespace FilmFormatter
 				Cell cityCell = row.ElementAtOrDefault(cityPosition);
 				Cell shortCell = row.ElementAtOrDefault(shortPosition);
 				Cell pageCell = row.ElementAtOrDefault(pagePosition);
-				//Console.WriteLine("The size of R is " + r.Count());
+
 				String title = "";
 				String venue = "";
 				String city = "";
@@ -297,8 +279,7 @@ namespace FilmFormatter
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
 				int pageNumber = 1;
-
-
+				
 				if (titleCell != null && venueCell != null && cityCell != null)
 				{
 					//Time to pluck out the title, venue and city.
@@ -337,8 +318,6 @@ namespace FilmFormatter
 							}
 							if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 							{
-
-								Console.WriteLine("Title: " + title + "Pagecell: " + pageCell);
 								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
 								//Gotta ignore the blank cells
 								if (sessionInfo.getCity() != "")
@@ -375,7 +354,6 @@ namespace FilmFormatter
 
 				}
 			}
-			Console.WriteLine("hey");
 		}
 
 		private WorksheetPart GetWorkSheetFromSheetName(WorkbookPart workbookpart, String sheetName)
@@ -417,19 +395,23 @@ namespace FilmFormatter
 						if (titleCell.DataType == CellValues.SharedString)
 						{
 							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
-							Console.WriteLine(title);
 						}
 
 						int runningTime;
 						if (int.TryParse(runningTimeCell.InnerText, out runningTime))
 						{
-							Console.WriteLine(runningTime);
+
 						}
 						ttrt.Add(System.Tuple.Create(title, runningTime));
 					}
 				}
 			}
 			return ttrt;
+		}
+
+		private void progressBar1_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

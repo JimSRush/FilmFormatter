@@ -65,6 +65,12 @@ namespace FilmFormatter
 		{ 
 			return this.filmTitle;
 		}
+
+		public override string ToString()
+		{
+			return "Title: " + filmTitle + " " + getTime();
+		}
+
 		private static readonly Dictionary<string, string> venuesToAbbreviations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			{"ACADEMY", "AC"},
@@ -85,7 +91,7 @@ namespace FilmFormatter
 			{"HOYTS NORTHLAND 4", "Northlands"},
 			{"HOYTS NORTHLAND 2", "Northlands"},
 			{"ISAAC THEATRE ROYAL (Christchurch)", "Isaac Theatre"},
-			{"LEN LYE (New Plymouth)", "N. Ply, Len Lye"},
+			{"LEN LYE", "N. Ply, Len Lye"},
 			{"LIDO", "Hamilton"},
 			{"LIGHTHOUSE", "LHP"},
 			{"MOVIEMAX (Timaru)", "MM Timaru"},
@@ -101,8 +107,11 @@ namespace FilmFormatter
 			{"SKY CITY", "SCT"},
 			{"ST JAMES (Gore)", "SJ Gore"},
 			{"STATE CINEMA (Nelson)", "STATE"},
-			{"SUTER (Nelson)", "SUTER"},
-			{"TEPAPA", "TP"}
+			{"SUTER", "SUTER"},
+			{"TEPAPA", "TP"},
+			{"HOYTS RICCARTON", "Riccarton"},
+			{"MOTUEKA", "MOTUEKA"},
+			{"READING (Wellington)", "RCC"}
 		};
 
 		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber)

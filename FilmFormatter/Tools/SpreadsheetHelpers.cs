@@ -23,7 +23,7 @@ namespace FilmFormatter.Tools
 				sum *= 26;
 				sum += (columnLetter[i] - 'A' + 1);
 			}
-			return sum;
+			return sum-1;
 		}
 
 
