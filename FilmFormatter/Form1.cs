@@ -47,16 +47,15 @@ namespace FilmFormatter
 		private void loadFile(String fileName)
 		{
 			var watch = new System.Diagnostics.Stopwatch();
-
 			watch.Start();
-
-
 			using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{
 				using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fs, false))
 				{
 					WorkbookPart workbookPart = myDoc.WorkbookPart;
+					
 					FilmFormatter.Tools.SpreadSheetWorkers.titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
+			
 					//parse main sheet
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
@@ -67,7 +66,7 @@ namespace FilmFormatter
 					Console.WriteLine(rawFilms.Count);
 					//parse the films and write to file
 					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
-					
+
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in cities)
 					{
@@ -75,9 +74,7 @@ namespace FilmFormatter
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByDate(t);
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
 					}
-					watch.Stop();
 
-					Console.WriteLine("Execution Time: {0} ms", watch.ElapsedMilliseconds);
 					Application.Exit();
 
 				}
@@ -96,6 +93,8 @@ namespace FilmFormatter
 			int shortPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("G"); //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BG"); ///AB column
 			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+
+			SharedStringItem[] sharedStringItemsArray = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ToArray<SharedStringItem>();
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
@@ -125,10 +124,10 @@ namespace FilmFormatter
 						if (titleCell.DataType == CellValues.SharedString && venueCell.DataType == CellValues.SharedString && cityCell.DataType == CellValues.SharedString && timeCell.InnerText != "")
 						{
 							//Here, we have to get the text for each. TODO put this in a method.
-							title = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(titleCell.CellValue.Text)).InnerText;
-							venue = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(venueCell.CellValue.Text)).InnerText;
-							city = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityCell.CellValue.Text)).InnerText;
-							shortFilm = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortCell.CellValue.Text)).InnerText;
+							title = sharedStringItemsArray[int.Parse(titleCell.CellValue.Text)].InnerText;
+							venue = sharedStringItemsArray[int.Parse(venueCell.CellValue.Text)].InnerText;
+							city = sharedStringItemsArray[int.Parse(cityCell.CellValue.Text)].InnerText;
+							shortFilm = sharedStringItemsArray[int.Parse(shortCell.CellValue.Text)].InnerText;
 
 							//And the time
 							String formattedValue = timeCell.InnerText;
