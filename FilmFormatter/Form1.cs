@@ -11,6 +11,7 @@ using System.Linq.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -41,8 +42,32 @@ namespace FilmFormatter
 			loadFile(file);
 		}
 
+
+		private void threadFilmsByTitle(Tuple<string, List<TitleSessionInfo>> t) 
+		{
+			var city = t.Item1;
+			var films = t.Item2;
+			List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, films);
+			writeOutTitlesToFile(filmsByTitle, city);
+
+		}
+
+		private void threadFilmsByDate(Tuple<string, List<TitleSessionInfo>> t)
+		{
+			var city = t.Item1;
+			var films = t.Item2;
+			List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, films);
+			writeOutDatesToFile(filmsByDate, city);
+		}
+
+
 		private void loadFile(String fileName)
 		{
+			var watch = new System.Diagnostics.Stopwatch();
+
+			watch.Start();
+
+
 			using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{
 				using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(fs, false))
@@ -63,11 +88,20 @@ namespace FilmFormatter
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in cities)
 					{
-						List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, rawFilmsForOrderByDate);
-						List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate = parseFilmsByDateByCity(city, rawFilmsForOrderByDate);
-						writeOutTitlesToFile(filmsByTitle, city);
-						writeOutDatesToFile(filmsByDate, city);
+						var t = System.Tuple.Create(city, rawFilmsForOrderByDate);
+
+						//Thread th = new Thread(threadFilmsByDate);
+
+						//Thread th = new Thread(new ParameterizedThreadStart(threadFilmsByTitle));
+						//th.Start(t);
+
+
+						threadFilmsByTitle(t);
+						threadFilmsByDate(t);
 					}
+					watch.Stop();
+
+					Console.WriteLine("Execution Time: {0} ms", watch.ElapsedMilliseconds);
 					Application.Exit();
 
 				}
@@ -384,8 +418,9 @@ namespace FilmFormatter
 			foreach (Row r in sheetData.Elements<Row>())
 			{
 				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r, columnLetters).ToList();
-				Cell titleCell = row.ElementAtOrDefault(2);
-				Cell runningTimeCell = row.ElementAtOrDefault(10);
+
+				Cell titleCell = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("C"));
+				Cell runningTimeCell = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("L"));
 
 				if (titleCell != null)
 				{

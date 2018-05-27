@@ -1,0 +1,11 @@
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.Form1.resources
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.Properties.Resources.resources
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.csproj.GenerateResource.Cache
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\bin\Release\FilmFormatter.exe.config
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\bin\Release\FilmFormatter.exe
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\bin\Release\FilmFormatter.pdb
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\bin\Release\DocumentFormat.OpenXml.dll
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\bin\Release\System.Linq.Dynamic.dll
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.exe
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.pdb
+C:\Users\Jimbo\Desktop\FF\FilmFormatter\FilmFormatter\obj\Release\FilmFormatter.csprojResolveAssemblyReference.cache
