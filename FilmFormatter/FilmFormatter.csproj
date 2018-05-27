@@ -63,7 +63,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\SessionInfo.cs" />
-    <Compile Include="Tools\Class1.cs" />
+    <Compile Include="Tools\SpreadSheetWorkers.cs" />
     <Compile Include="Tools\SpreadsheetHelpers.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
