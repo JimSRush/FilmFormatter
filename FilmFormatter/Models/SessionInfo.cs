@@ -22,8 +22,8 @@ namespace FilmFormatter
 
 
 		public string getProgram()
-		{ 
-			return this.shortFilm;
+		{
+			return this.program;
 		}
 
 		public string getShort()

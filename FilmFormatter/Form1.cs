@@ -79,6 +79,13 @@ namespace FilmFormatter
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
 					}
 
+					foreach (String prog in p)
+					{
+						var t = System.Tuple.Create(prog, rawFilmsForOrderByDate);
+						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByDate(t);
+						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
+					}
+
 	
 
 					Application.Exit();
