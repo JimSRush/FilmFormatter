@@ -18,12 +18,20 @@ namespace FilmFormatter
 		private TimeSpan screeningTimeAsTimeSpan;
 		private int pageNumber;
 		private DateTime dateTimeDate;
+		private string program;
 
 
-		public string getShort()
+		public string getProgram()
 		{ 
 			return this.shortFilm;
 		}
+
+		public string getShort()
+		{
+			return this.shortFilm;
+		}
+
+
 		public String getSessionType()
 		{
 			return this.sessionType;
@@ -114,7 +122,7 @@ namespace FilmFormatter
 			{"READING (Wellington)", "RCC"}
 		};
 
-		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber)
+		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber, String program)
 		{
 			setScreeningTimeAsALetter(screeningTime, filmDate);
 			formatSessionTime(screeningTime);
@@ -126,6 +134,7 @@ namespace FilmFormatter
 			this.screeningTimeAsTimeSpan = screeningTime;
 			this.pageNumber = pageNumber;
 			this.dateTimeDate = filmDate;
+			this.program = program;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{

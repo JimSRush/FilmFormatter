@@ -67,20 +67,51 @@ namespace FilmFormatter
 					Console.WriteLine("Size of films");
 					Console.WriteLine(rawFilms.Count);
 					//parse the films and write to file
-					List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
+					//List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
+					List<String> c = cities(rawFilms);
+					List<String> p = programs(rawFilms);
 
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
-					foreach (String city in cities)
+					foreach (String city in c)
 					{
 						var t = System.Tuple.Create(city, rawFilmsForOrderByDate);	
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByDate(t);
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
 					}
 
+	
+
 					Application.Exit();
 
 				}
 			}
+		}
+
+		private List<string> programs(List<TitleSessionInfo> films)
+		{
+			List<string> programs = new List<string>();
+
+			foreach (TitleSessionInfo f in films)
+			{
+				if (!programs.Contains(f.getProgram()))
+				{
+					programs.Add(f.getProgram());
+				}
+			}
+			return programs;
+		}
+
+		private List<string> cities(List<TitleSessionInfo> films) 
+		{ 
+			List<string> cities = new List<string>();
+
+			foreach (TitleSessionInfo f in films) {
+				if (!cities.Contains(f.getCity()))
+				{ 
+					cities.Add(f.getCity());
+				}
+			}
+			return cities;
 		}
 
 		private List<TitleSessionInfo> parseFilms(SheetData sheetData, WorkbookPart workbookpart)
@@ -94,6 +125,7 @@ namespace FilmFormatter
 			int cityPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("N");
 			int shortPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("G"); //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BI");
+			int programPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BG");
 		
 
 			SharedStringItem[] sharedStringItemsArray = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ToArray<SharedStringItem>();
@@ -110,10 +142,12 @@ namespace FilmFormatter
 				Cell cityCell = row.ElementAtOrDefault(cityPosition);
 				Cell shortCell = row.ElementAtOrDefault(shortPosition);
 				Cell pageCell = row.ElementAtOrDefault(pagePosition);
+				Cell programCell = row.ElementAtOrDefault(programPosition);
 
 				String title = "";
 				String venue = "";
 				String city = "";
+				String program = "";
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
@@ -131,13 +165,13 @@ namespace FilmFormatter
 							venue = sharedStringItemsArray[int.Parse(venueCell.CellValue.Text)].InnerText;
 							city = sharedStringItemsArray[int.Parse(cityCell.CellValue.Text)].InnerText;
 							shortFilm = sharedStringItemsArray[int.Parse(shortCell.CellValue.Text)].InnerText;
+							program = sharedStringItemsArray[int.Parse(programCell.CellValue.Text)].InnerText;
 
 							//And the time
 							String formattedValue = timeCell.InnerText;
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
 							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
-							Console.WriteLine(pageCell.CellValue.Text);
-							Console.WriteLine(pageCell.DataType);
+
 							if (pageCell != null)
 							{
 								int v;
@@ -156,7 +190,7 @@ namespace FilmFormatter
 							}
 							if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 							{
-								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
+								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber, program);
 								//Gotta ignore the blank cells
 								if (sessionInfo.getCity() != "")
 								{
