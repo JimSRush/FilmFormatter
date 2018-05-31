@@ -58,6 +58,8 @@ namespace FilmFormatter
 			
 					//parse main sheet
 					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
+					Console.WriteLine("Reference");
+					Console.WriteLine(worksheetPart.Worksheet.SheetDimension.Reference);
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
 					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();	
 
@@ -86,19 +88,20 @@ namespace FilmFormatter
 			List<TitleSessionInfo> rawSchedule = new List<TitleSessionInfo>();
 
 			int titlePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("D");
-			int datePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("I");//6
-			int timePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("J");//7
-			int venuePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("L");//9
-			int cityPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("N");//10
+			int datePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("I");
+			int timePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("J");
+			int venuePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("L");
+			int cityPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("N");
 			int shortPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("G"); //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
-			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BG"); ///AB column
-			var columnLetters = new List<string>() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BI");
+		
 
 			SharedStringItem[] sharedStringItemsArray = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ToArray<SharedStringItem>();
-
+			//Get each row
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r, columnLetters).ToList();
+				//Pluck out the individual row
+				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.getExcelRowCells(r);
 
 				Cell titleCell = row.ElementAtOrDefault(titlePosition);
 				Cell dateCell = row.ElementAtOrDefault(datePosition);
@@ -133,13 +136,12 @@ namespace FilmFormatter
 							String formattedValue = timeCell.InnerText;
 							Decimal timeAsDecimal = Convert.ToDecimal(formattedValue) * 24;
 							ts = TimeSpan.FromHours(Decimal.ToDouble(timeAsDecimal));
+							Console.WriteLine(pageCell.CellValue.Text);
+							Console.WriteLine(pageCell.DataType);
 							if (pageCell != null)
 							{
 								int v;
-								if (Int32.TryParse(pageCell.InnerText, out v))
-								{
-									pageNumber = v;
-								}
+								if (int.TryParse(pageCell.CellValue.Text, out pageNumber)) ;
 							}
 							//AAAAaaand the date
 
@@ -186,7 +188,7 @@ namespace FilmFormatter
 
 			foreach (Row r in sheetData.Elements<Row>())
 			{
-				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r, columnLetters).ToList();
+				List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r).ToList();
 
 				Cell titleCell = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("C"));
 				Cell runningTimeCell = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("L"));

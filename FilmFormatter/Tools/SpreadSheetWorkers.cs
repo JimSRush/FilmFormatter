@@ -191,7 +191,6 @@ namespace FilmFormatter.Tools
 								{
 									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
-									
 								}
 								
 							}

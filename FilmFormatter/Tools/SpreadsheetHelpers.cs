@@ -35,7 +35,34 @@ namespace FilmFormatter.Tools
 			return match.Value;
 		}
 
-		public static IEnumerable<Cell> GetCellsForRow(Row row, List<string> columnLetters)
+		public static List<Cell> getExcelRowCells(Row row)
+		{
+			List<Cell> theCells = new List<Cell>();
+			int currentCount = 0;
+			foreach (Cell cell in row.Descendants<Cell>())
+			{
+				string columnName = GetColumnAddress(cell.CellReference);
+				int thisColIndex = ColumnLetterToColumnIndex(columnName);
+				while (currentCount < thisColIndex)
+				{
+					var emptyCell = new Cell()
+					{
+						DataType = null,
+						CellValue = new CellValue(string.Empty)
+					};
+					theCells.Add(emptyCell);
+					currentCount++;
+				}
+				theCells.Add(cell);
+				currentCount++;
+			}
+			
+			return theCells;
+		}
+
+
+
+		public static IEnumerable<Cell> GetCellsForRow(Row row)
 		{
 			int workIdx = 0;
 			foreach (var cell in row.Descendants<Cell>())
@@ -44,7 +71,7 @@ namespace FilmFormatter.Tools
 				var cellLetter = GetColumnAddress(cell.CellReference);
 
 				//Get column index of the matched cell  
-				int currentActualIdx = columnLetters.IndexOf(cellLetter);
+				int currentActualIdx = ColumnLetterToColumnIndex(cellLetter);
 
 				//Add empty cell if work index smaller than actual index
 				for (; workIdx < currentActualIdx; workIdx++)
@@ -61,7 +88,7 @@ namespace FilmFormatter.Tools
 				if (cell == row.LastChild)
 				{
 					//Append empty cells to enumerable 
-					for (; workIdx < columnLetters.Count(); workIdx++)
+					for (; workIdx < 75; workIdx++)
 					{
 						var emptyCell = new Cell() { DataType = null, CellValue = new CellValue(string.Empty) };
 						yield return emptyCell;
