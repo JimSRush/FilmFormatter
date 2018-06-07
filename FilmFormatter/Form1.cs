@@ -132,7 +132,7 @@ namespace FilmFormatter
 			int cityPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("N");
 			int shortPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("G"); //this is empty in the case of INWARDS/OUTWARDS, so need this to check against.
 			int pagePosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BI");
-			int programPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BG");
+			int programPosition = FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("BJ");
 		
 
 			SharedStringItem[] sharedStringItemsArray = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ToArray<SharedStringItem>();
@@ -154,7 +154,7 @@ namespace FilmFormatter
 				String title = "";
 				String venue = "";
 				String city = "";
-				String program = "";
+				String program = "p1";
 				DateTime newDate = new DateTime();
 				TimeSpan ts = new TimeSpan();
 				String shortFilm = "";
@@ -172,7 +172,8 @@ namespace FilmFormatter
 							venue = sharedStringItemsArray[int.Parse(venueCell.CellValue.Text)].InnerText;
 							city = sharedStringItemsArray[int.Parse(cityCell.CellValue.Text)].InnerText;
 							shortFilm = sharedStringItemsArray[int.Parse(shortCell.CellValue.Text)].InnerText;
-							program = sharedStringItemsArray[int.Parse(programCell.CellValue.Text)].InnerText;
+                            //if (progra)
+							//program = sharedStringItemsArray[int.Parse(programCell.CellValue.Text)].InnerText;
 
 							//And the time
 							String formattedValue = timeCell.InnerText;
