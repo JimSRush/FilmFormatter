@@ -19,7 +19,7 @@ namespace FilmFormatter.Tools
 			foreach (TitleSessionInfo session in rawFilms)
 			{
 				if (session.getCity() == city)
-				{
+				{//if it doesn't exiat, add it
 					if (!filmByCity.Any(dic => dic.ContainsKey(session.getTitle())))
 					{
 						Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>() 
@@ -29,7 +29,7 @@ namespace FilmFormatter.Tools
 						filmByCity.Add(toAdd);
 					}
 					else
-					{
+					{//otherwise add it
 						foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmByCity)
 						{
 							if (dict.ContainsKey(session.getTitle()))
