@@ -27,7 +27,6 @@ C:\Users\jimrush\dev\filmformatter\FilmFormatter\bin\Debug\FilmFormatter.exe
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\bin\Debug\FilmFormatter.pdb
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\bin\Debug\DocumentFormat.OpenXml.dll
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\bin\Debug\System.Linq.Dynamic.dll
-C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.csprojResolveAssemblyReference.cache
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.Form1.resources
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.Properties.Resources.resources
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.csproj.GenerateResource.Cache

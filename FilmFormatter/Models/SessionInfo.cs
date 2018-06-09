@@ -79,49 +79,6 @@ namespace FilmFormatter
 			return "Title: " + filmTitle + " " + getTime();
 		}
 
-		private static readonly Dictionary<string, string> venuesToAbbreviations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-		{
-			{"ACADEMY", "AC"},
-			{"BERGMAN", "PB"},
-			{"CINEMA GOLD", "Havelock Nth"},
-			{"CITY GALLERY", "CG"},
-			{"CIVIC", "CIVIC"},
-			{"DELUXE", "ED"},
-			{"DOWNTOWN CINEMA", "P. North"},
-			{"EMBASSY", "EMB"},
-			{"EVENT (New Plymouth)", "N. Ply, Event"},
-			{"QUEEN ST", "QSt"},
-			{"MANAKAU", "MK"},
-			{"WESTGATE", "WGATE"},
-			{"HOLLYWOOD", "HWOOD"},
-			{"ASB WATERFRONT THEATRE", "AWT"},
-			{"HOYTS NORTHLAND 3", "Northlands"},
-			{"HOYTS NORTHLAND 4", "Northlands"},
-			{"HOYTS NORTHLAND 2", "Northlands"},
-			{"ISAAC THEATRE ROYAL (Christchurch)", "Isaac Theatre"},
-			{"LEN LYE", "N. Ply, Len Lye"},
-			{"LIDO", "Hamilton"},
-			{"LIGHTHOUSE", "LHP"},
-			{"MOVIEMAX (Timaru)", "MM Timaru"},
-			{"NGA TAONGA", "NT"},
-			{"PARAMOUNT", "PAR"},
-			{"PENTHOUSE", "PH"},
-			{"REGENT (Dunedin)", "Regent"},
-			{"REGENT (Masterton)", "Masterton"},
-			{"RIALTO (Auckland)", "Rialto"},
-			{"RIALTO (Dunedin)", "Rialto"},
-			{"RIALTO (Tauranga)", "Tauranga"},
-			{"ROXY", "RX"},
-			{"SKY CITY", "SCT"},
-			{"ST JAMES (Gore)", "SJ Gore"},
-			{"STATE CINEMA (Nelson)", "STATE"},
-			{"SUTER", "SUTER"},
-			{"TEPAPA", "TP"},
-			{"HOYTS RICCARTON", "Riccarton"},
-			{"MOTUEKA", "MOTUEKA"},
-			{"READING (Wellington)", "RCC"}
-		};
-
 		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber, String program)
 		{
 			setScreeningTimeAsALetter(screeningTime, filmDate);
@@ -143,12 +100,12 @@ namespace FilmFormatter
 
 		private void setAbbreviatedVenue(String venue)
 		{
-			if (!venuesToAbbreviations.ContainsKey(venue)) 
+			if (!FilmFormatter.Tools.SpreadSheetWorkers.vmappings.ContainsKey(venue)) 
 			{
 				this.venue = venue;
 				return;
 			}
-			this.venue = venuesToAbbreviations[venue];
+			this.venue = FilmFormatter.Tools.SpreadSheetWorkers.vmappings[venue];
 		}
 
 		private void formatSessionTime(TimeSpan screeningTime)

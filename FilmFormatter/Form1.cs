@@ -41,10 +41,7 @@ namespace FilmFormatter
 			loadFile(file);
 		}
 
-
-
-
-		private void loadFile(String fileName)
+        private void loadFile(String fileName)
 		{
 			var watch = new System.Diagnostics.Stopwatch();
 			watch.Start();
@@ -55,17 +52,14 @@ namespace FilmFormatter
 					WorkbookPart workbookPart = myDoc.WorkbookPart;
 					
 					FilmFormatter.Tools.SpreadSheetWorkers.titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
-			
-					//parse main sheet
-					WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
-					Console.WriteLine("Reference");
-					Console.WriteLine(worksheetPart.Worksheet.SheetDimension.Reference);
+                    FilmFormatter.Tools.SpreadSheetWorkers.vmappings = VenueMappings(GetWorkSheetFromSheetName(workbookPart, "DATA"), workbookPart);
+
+                    //parse main sheet
+                    WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
 					SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().Last();
 					List<TitleSessionInfo> rawFilms = new List<TitleSessionInfo>();	
 
 					rawFilms = parseFilms(sheetData, workbookPart);
-					Console.WriteLine("Size of films");
-					Console.WriteLine(rawFilms.Count);
 					//parse the films and write to file
 					//List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
 					List<String> c = cities(rawFilms);
@@ -222,7 +216,35 @@ namespace FilmFormatter
 			else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
 		}
 
-		private List<Tuple<String, int>> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
+        private Dictionary<string, string> VenueMappings(WorksheetPart worksheetpart, WorkbookPart workbookpart)
+        {
+            SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
+            Dictionary<string, string> venueMappings = new Dictionary<string, string>();
+            foreach (Row r in sheetData.Elements<Row>()) {
+                List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r).ToList();
+                Cell longVenue = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("AO"));
+                Cell shortVenue = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("AP"));
+
+                if (longVenue != null && shortVenue != null) {
+                    if (longVenue.DataType != null && shortVenue.DataType != null) {
+                        string lv = "";
+                        string sv = "";
+                        if (longVenue.DataType == CellValues.SharedString && shortVenue.DataType == CellValues.SharedString)
+                        {
+                            lv = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(longVenue.CellValue.Text)).InnerText;
+                            sv = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(shortVenue.CellValue.Text)).InnerText;
+                            venueMappings[lv] = sv;
+                        }
+                    }
+                }
+
+            }
+            return venueMappings;
+        }
+
+
+
+        private List<Tuple<String, int>> GetTitlesFromRuntime(WorksheetPart worksheetpart, WorkbookPart workbookpart)
 		{
 			SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
 			List<Tuple<string, int>> ttrt = new List<Tuple<string, int>>();

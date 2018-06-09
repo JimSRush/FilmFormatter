@@ -11,6 +11,8 @@ namespace FilmFormatter.Tools
 	{
 
 		public static List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
+        //List of long venue to short venue
+        public static Dictionary<string, string> vmappings = new Dictionary<string, string>();
 		public static  Dictionary<String, List<String>> citiesToVenues = new Dictionary<String, List<String>>();
 
 		public static List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms)
