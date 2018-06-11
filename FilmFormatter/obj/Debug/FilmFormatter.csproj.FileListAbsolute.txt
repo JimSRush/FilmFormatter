@@ -30,3 +30,4 @@ C:\Users\jimrush\dev\filmformatter\FilmFormatter\bin\Debug\System.Linq.Dynamic.d
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.Form1.resources
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.Properties.Resources.resources
 C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.csproj.GenerateResource.Cache
+C:\Users\jimrush\dev\filmformatter\FilmFormatter\obj\Debug\FilmFormatter.csprojResolveAssemblyReference.cache

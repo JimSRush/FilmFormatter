@@ -13,7 +13,8 @@ namespace FilmFormatter.Tools
 		public static List<Tuple<string, int>> titlesToRunTime = new List<Tuple<string, int>>();
         //List of long venue to short venue
         public static Dictionary<string, string> vmappings = new Dictionary<string, string>();
-		public static  Dictionary<String, List<String>> citiesToVenues = new Dictionary<String, List<String>>();
+		public static Dictionary<String, List<String>> citiesToVenues = new Dictionary<String, List<String>>();
+        public static Dictionary<string, string> programToSortOrder = new Dictionary<string, string>();
 
 		public static List<Dictionary<String, List<TitleSessionInfo>>> parseFilmsByTitleForCity(String city, List<TitleSessionInfo> rawFilms)
 		{
@@ -50,7 +51,42 @@ namespace FilmFormatter.Tools
 			return filmByCity;
 		}
 
-		public static List<Dictionary<DateTime, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
+        public static List<Dictionary<String, List<TitleSessionInfo>>> sortFilmsByDateByProgram(String program, List<TitleSessionInfo> rawFilms)
+        {
+            List<Dictionary<String, List<TitleSessionInfo>>> filmsByProgram = new List<Dictionary<String, List<TitleSessionInfo>>>();
+            foreach (TitleSessionInfo session in rawFilms)
+            {
+                if (session.getProgram() == program)
+                {//if it doesn't exiat, add it
+                    if (!filmsByProgram.Any(dic => dic.ContainsKey(session.getTitle())))
+                    {
+                        Dictionary<String, List<TitleSessionInfo>> toAdd = new Dictionary<string, List<TitleSessionInfo>>()
+                        {
+                            {session.getTitle(), new List<TitleSessionInfo>(){session}}
+                        };
+                        filmsByProgram.Add(toAdd);
+                    }
+                    else
+                    {//otherwise add it
+                        foreach (Dictionary<String, List<TitleSessionInfo>> dict in filmsByProgram)
+                        {
+                            if (dict.ContainsKey(session.getTitle()))
+                            {
+                                List<TitleSessionInfo> toUpdate = dict[session.getTitle()];
+                                toUpdate.Add(session);
+                                dict[session.getTitle()] = toUpdate;
+
+                            }
+                        }
+
+                    }
+
+                }
+            }
+            return filmsByProgram;
+        }
+
+        public static List<Dictionary<DateTime, List<TitleSessionInfo>>> parseFilmsByDateByCity(String city, List<TitleSessionInfo> rawFilms)
 		{
 			List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByCityByDate = new List<Dictionary<DateTime, List<TitleSessionInfo>>>();
 			foreach (TitleSessionInfo session in rawFilms)

@@ -53,6 +53,7 @@ namespace FilmFormatter
 					
 					FilmFormatter.Tools.SpreadSheetWorkers.titlesToRunTime = GetTitlesFromRuntime(GetWorkSheetFromSheetName(workbookPart, "MAIN"), workbookPart);
                     FilmFormatter.Tools.SpreadSheetWorkers.vmappings = VenueMappings(GetWorkSheetFromSheetName(workbookPart, "DATA"), workbookPart);
+                    FilmFormatter.Tools.SpreadSheetWorkers.programToSortOrder = CityToProgramme(GetWorkSheetFromSheetName(workbookPart, "DATA"), workbookPart);
 
                     //parse main sheet
                     WorksheetPart worksheetPart = GetWorkSheetFromSheetName(workbookPart, "SCREENING INFO");
@@ -61,9 +62,7 @@ namespace FilmFormatter
 
 					rawFilms = parseFilms(sheetData, workbookPart);
 					//parse the films and write to file
-					//List<String> cities = new List<String> { "AUCKLAND", "CHRISTCHURCH", "DUNEDIN", "GORE", "HAMILTON", "HAVELOCK NORTH", "NAPIER", "MASTERTON", "NELSON", "NEW PLYMOUTH", "PALMERSTON NORTH", "TAURANGA", "TIMARU", "WELLINGTON", "HAWKE'S BAY" };
 					List<String> c = cities(rawFilms);
-					List<String> p = programs(rawFilms);
 
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in c)
@@ -73,33 +72,25 @@ namespace FilmFormatter
 						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
 					}
 
-					foreach (String prog in p)
-					{
-						var t = System.Tuple.Create(prog, rawFilmsForOrderByDate);
-						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByDate(t);
-						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
-					}
+                    var filteredFilms = rawFilmsForOrderByDate.Where(o => o.getSortOrder() != 0).ToList();
+                    var sortedFilteredFilms = filteredFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ThenBy(x => x.getSortOrder()).ToList();
 
-	
+                    var programs = (from f in sortedFilteredFilms
+                                      select f.getProgram()).Distinct();
 
-					Application.Exit();
+                    foreach (var program in programs)
+                    {
+
+                        var filmsByProgram = FilmFormatter.Tools.SpreadSheetWorkers.sortFilmsByDateByProgram(program, sortedFilteredFilms);
+                        FilmFormatter.Tools.SpreadSheetWorkers.writeOutTitlesToFile(filmsByProgram, program);
+                    }
+                    
+
+
+                    Application.Exit();
 
 				}
 			}
-		}
-
-		private List<string> programs(List<TitleSessionInfo> films)
-		{
-			List<string> programs = new List<string>();
-
-			foreach (TitleSessionInfo f in films)
-			{
-				if (!programs.Contains(f.getProgram()))
-				{
-					programs.Add(f.getProgram());
-				}
-			}
-			return programs;
 		}
 
 		private List<string> cities(List<TitleSessionInfo> films) 
@@ -192,7 +183,7 @@ namespace FilmFormatter
 							}
 							if (!shortFilm.Equals("INWARDS") && !shortFilm.Equals("OUTWARDS"))
 							{
-								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber, program);
+								TitleSessionInfo sessionInfo = new TitleSessionInfo(title, venue, city, newDate, ts, shortFilm, pageNumber);
 								//Gotta ignore the blank cells
 								if (sessionInfo.getCity() != "")
 								{
@@ -215,6 +206,44 @@ namespace FilmFormatter
 			if (sheet == null) throw new Exception(string.Format("Could not find sheet with name {0}", sheetName));
 			else return workbookpart.GetPartById(sheet.Id) as WorksheetPart;
 		}
+
+        //Program and sort order
+            //City mapped to programme
+        private Dictionary<string, string> CityToProgramme(WorksheetPart worksheetpart, WorkbookPart workbookpart)
+        {
+            SheetData sheetData = worksheetpart.Worksheet.Elements<SheetData>().Last();
+            Dictionary<string, string> ctp = new Dictionary<string, string>();
+            foreach (Row r in sheetData.Elements<Row>())
+            {
+                List<Cell> row = FilmFormatter.Tools.SpreadsheetHelpers.GetCellsForRow(r).ToList();
+                Cell programInfo = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("AR"));
+                Cell cityInfo = row.ElementAtOrDefault(FilmFormatter.Tools.SpreadsheetHelpers.ColumnLetterToColumnIndex("AQ"));
+
+                if (programInfo != null && cityInfo != null)
+                {
+                    if (programInfo.DataType != null && cityInfo.DataType !=null )
+                    {
+                        string pi = "";
+                        string ci = "";
+
+                        if (programInfo.DataType == CellValues.SharedString && cityInfo.DataType == CellValues.SharedString)
+                        {
+                            pi = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(programInfo.CellValue.Text)).InnerText;
+                            ci = workbookpart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(Convert.ToInt32(cityInfo.CellValue.Text)).InnerText;
+                          
+                            if (!ctp.ContainsKey(ci))
+                            {
+                                ctp.Add(ci, pi);
+                            }
+                        }
+                    }
+                }
+          
+            }
+
+            return ctp;
+
+        }
 
         private Dictionary<string, string> VenueMappings(WorksheetPart worksheetpart, WorkbookPart workbookpart)
         {

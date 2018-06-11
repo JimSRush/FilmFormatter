@@ -18,19 +18,19 @@ namespace FilmFormatter
 		private TimeSpan screeningTimeAsTimeSpan;
 		private int pageNumber;
 		private DateTime dateTimeDate;
-		private string program;
+        private int sortOrder;
+        private string programmeNumber;
 
 
 		public string getProgram()
 		{
-			return this.program;
+			return this.programmeNumber;
 		}
 
 		public string getShort()
 		{
 			return this.shortFilm;
 		}
-
 
 		public String getSessionType()
 		{
@@ -79,19 +79,24 @@ namespace FilmFormatter
 			return "Title: " + filmTitle + " " + getTime();
 		}
 
-		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber, String program)
+        public int getSortOrder()
+        {
+            return this.sortOrder;
+        }
+
+		public TitleSessionInfo(String title, String venue, string city, DateTime filmDate, TimeSpan screeningTime, String shortFilm, int pageNumber)
 		{
 			setScreeningTimeAsALetter(screeningTime, filmDate);
 			formatSessionTime(screeningTime);
 			setDateAsString(filmDate);
 			setAbbreviatedVenue(venue);
+            setProgrammeAndSortOrder(city);
 			this.filmTitle = title;
 			this.city = city;
 			this.shortFilm = shortFilm;
 			this.screeningTimeAsTimeSpan = screeningTime;
 			this.pageNumber = pageNumber;
 			this.dateTimeDate = filmDate;
-			this.program = program;
 		}
 		private void setDateAsString(DateTime filmDate)
 		{
@@ -107,6 +112,24 @@ namespace FilmFormatter
 			}
 			this.venue = FilmFormatter.Tools.SpreadSheetWorkers.vmappings[venue];
 		}
+
+        //find the city in the spreadsheet workers
+        //parse out the programme info
+        //set the program string
+        //set the order in program
+        private void setProgrammeAndSortOrder(string city)
+        {
+            if (FilmFormatter.Tools.SpreadSheetWorkers.programToSortOrder.ContainsKey(city))
+                {
+                    var programmeInfo = FilmFormatter.Tools.SpreadSheetWorkers.programToSortOrder[city];
+                    string[] words = programmeInfo.Split('-');
+                    this.programmeNumber = words[0];
+                    if (words.Length > 1)
+                    {
+                    System.Int32.TryParse(words[1], out this.sortOrder);
+                    }
+                }      
+        }
 
 		private void formatSessionTime(TimeSpan screeningTime)
 		{
