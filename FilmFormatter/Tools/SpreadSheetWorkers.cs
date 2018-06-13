@@ -119,39 +119,6 @@ namespace FilmFormatter.Tools
 			return filmsByCityByDate;
 		}
 
-		private static void DateStart(Tuple<string, List<TitleSessionInfo>> films)
-		{
-			var city = films.Item1;
-			var f = films.Item2;
-			var filmsByDate = parseFilmsByDateByCity(city, f);
-			writeOutDatesToFile(filmsByDate, city);
-		}
-		
-		private static void TitleStart(Tuple<string, List<TitleSessionInfo>>  films)
-		{
-			var city = films.Item1;
-			var f = films.Item2;
-			List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle = parseFilmsByTitleForCity(city, f);
-			writeOutTitlesToFile(filmsByTitle, city);
-		}
-
-		public static Thread threadFilmsByDate(Tuple<string, List<TitleSessionInfo>> films)
-		{
-			var f = films;
-			var t = new Thread(() => DateStart(f));
-			t.Start();
-			return t;
-		}
-
-		public static Thread threadFilmsByTitle(Tuple<string, List<TitleSessionInfo>> films)
-		{
-			var f = films;
-			var t = new Thread(() => TitleStart(f));
-			t.Start();
-			return t;
-		}
-
-
 		public static String setDateAsString(DateTime filmDate)
 		{
 			return String.Format("{0:dddd d MMMM}", filmDate);
@@ -191,8 +158,8 @@ namespace FilmFormatter.Tools
 		}
 
 
-		public static void writeOutDatesToFile(List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate, String city)
-		{
+        public static void writeOutMultiCityVenuesByDate(List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate, String city) 
+        {
 			String outPutFolder = @"C:\Temp\";
 			System.IO.Directory.CreateDirectory(outPutFolder);
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt"))
@@ -208,8 +175,7 @@ namespace FilmFormatter.Tools
 						{
 							//find runtime
 							String shortRunTime = "";
-								//For the bigger cities
-							if (citiesToVenues[city].Count > 1) {
+							
 								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
 								{
 									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + "\t" + cs.getPageNumber();
@@ -230,34 +196,75 @@ namespace FilmFormatter.Tools
 									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + cs.getVenue() + ") " + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + "\t" + cs.getPageNumber();
 									file.WriteLine(toWrite);
 								}
-								
-							}
-							else { //this is for the single venuie cities
-								if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
-								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
-									
-								}
-								else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
-								  && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
-								  && !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase)
-								  && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
-								  && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
-								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " + "\t" + cs.getPageNumber();
-									file.WriteLine(toWrite);
-								}
-								else
-								{
-									String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
-									file.WriteLine(toWrite);
-								}
-							}
 						}
 					}
 				}
 			}
 		}
+
+        public static void writeOutSingleVenueCityByDate(List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate, String city)
+        {
+            String outPutFolder = @"C:\Temp\";
+            System.IO.Directory.CreateDirectory(outPutFolder);
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(outPutFolder + city + "filmsByDate.txt"))
+            {
+                foreach (Dictionary<DateTime, List<TitleSessionInfo>> date in filmsByDate)
+                {
+                    String newDate = setDateAsString(date.Keys.First());
+
+                    file.WriteLine(newDate);
+                    foreach (List<TitleSessionInfo> value in date.Values)
+                    {
+                        foreach (TitleSessionInfo cs in value)
+                        {
+                            //find runtime
+                            String shortRunTime = "";
+
+                            if (cs.getShort().Equals("NO SHORT", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
+                                file.WriteLine(toWrite);
+                            }
+                            else if (!cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase)
+                              && !cs.getShort().Equals("OUTWARDS", StringComparison.InvariantCultureIgnoreCase)
+                              && !cs.getShort().Equals("INWARDS", StringComparison.InvariantCultureIgnoreCase)
+                              && !cs.getShort().Equals("FILMMAKER PRESENT", StringComparison.InvariantCultureIgnoreCase)
+                              && !cs.getShort().Equals("INTERMISSION", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + " + " + getRunTimeFromTitle(cs.getShort()) + ") " +  "\t" + cs.getPageNumber();
+                                file.WriteLine(toWrite);
+
+                            }
+                            else
+                            {
+                                String toWrite = cs.getSessionType() + "\t" + cs.getTime() + "\t" + cs.getTitle() + " (" + getRunTimeFromTitle(cs.getTitle()) + ") " + "\t" + cs.getPageNumber();
+                                file.WriteLine(toWrite);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void writeOutDatesToFile(List<Dictionary<DateTime, List<TitleSessionInfo>>> filmsByDate, String city)
+        {
+            if (citiesToVenues[city].Count != 1)
+            {
+                writeOutMultiCityVenuesByDate(filmsByDate, city);
+            }
+            else
+            {
+                writeOutSingleVenueCityByDate(filmsByDate, city);
+            }
+
+
+
+
+        }
+
+
+
+
 		
 		public static void writeOutTitlesToFile(List<Dictionary<String, List<TitleSessionInfo>>> filmsByTitle, String city)
 		{

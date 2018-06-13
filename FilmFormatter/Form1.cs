@@ -67,22 +67,25 @@ namespace FilmFormatter
 					List<TitleSessionInfo> rawFilmsForOrderByDate = rawFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ToList();
 					foreach (String city in c)
 					{
-						var t = System.Tuple.Create(city, rawFilmsForOrderByDate);	
-						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByDate(t);
-						FilmFormatter.Tools.SpreadSheetWorkers.threadFilmsByTitle(t);
+
+                        var filmsByDate = FilmFormatter.Tools.SpreadSheetWorkers.parseFilmsByDateByCity(city, rawFilmsForOrderByDate);
+                        FilmFormatter.Tools.SpreadSheetWorkers.writeOutDatesToFile(filmsByDate, city);
+
+                        FilmFormatter.Tools.SpreadSheetWorkers.writeOutTitlesToFile(FilmFormatter.Tools.SpreadSheetWorkers.parseFilmsByTitleForCity(city, rawFilmsForOrderByDate), city);
 					}
 
                     var filteredFilms = rawFilmsForOrderByDate.Where(o => o.getSortOrder() != 0).ToList();
-                    var sortedFilteredFilms = filteredFilms.OrderBy(x => x.getDateTimeAsDate()).ThenBy(y => y.getTimeSpan()).ThenBy(x => x.getSortOrder()).ToList();
+                    //sort order, dateTimeAsData, getTimeSpan
+                    var sortedFilteredFilms = filteredFilms.OrderBy(x => x.getSortOrder()).ThenBy(y => y.getDateTimeAsDate()).ThenBy(x => x.getTimeSpan()).ToList();
 
                     var programs = (from f in sortedFilteredFilms
                                       select f.getProgram()).Distinct();
 
                     foreach (var program in programs)
                     {
-
                         var filmsByProgram = FilmFormatter.Tools.SpreadSheetWorkers.sortFilmsByDateByProgram(program, sortedFilteredFilms);
                         FilmFormatter.Tools.SpreadSheetWorkers.writeOutTitlesToFile(filmsByProgram, program);
+                       // FilmFormatter.Tools.SpreadSheetWorkers.writeOutDatesForProgram(FilmsBy)
                     }
                     
 
